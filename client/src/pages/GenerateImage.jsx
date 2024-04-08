@@ -10,7 +10,7 @@ const GenerateImage = () => {
     console.log("Positive Prompts", positivePrompts);
 
     // const url = "http://localhost:5000/api/generateImage";
-    const url = "https://vrika.onrender.com/api/generateImage";
+    const url = "https://vrika-ai.onrender.com/api/generateImage";
     const result = await fetch(url, {
       method: "POST",
       headers: {
