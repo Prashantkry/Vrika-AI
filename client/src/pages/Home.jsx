@@ -1,5 +1,15 @@
 import "../App.css";
 const Home = () => {
+  function handleMouseEnter() {
+    let showHide = document.getElementById("showHide");
+    showHide.style.display = "block";
+  }
+  function handleMouseLeave() {
+    let showHide = document.getElementById("showHide");
+    setTimeout(() => {
+      showHide.style.display = "none";
+    }, 500);
+  }
   return (
     <>
       <main>
