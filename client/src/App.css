@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Arizonia&family=Lovers+Quarrel&family=Monsieur+La+Doulaise&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.arizonia_regular {
+  font-family: "Arizonia", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.alex-brush-regular {
+  font-family: "Alex Brush", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.monsieur-la{
+  font-family: "Monsieur La Doulaise", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lovers-quarrel-regular {
+    font-family: "Lovers Quarrel", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
