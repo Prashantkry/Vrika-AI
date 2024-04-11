@@ -1,6 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import w2, { w1, w3, w4, w5 } from "./Image";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  SignIn,
+} from "@clerk/clerk-react";
+import { dark } from "@clerk/themes";
 
 const Navbar = () => {
   return (
@@ -20,15 +28,67 @@ const Navbar = () => {
             <Link to="/" className="text-red-500">
               Home
             </Link>
-            <Link to="/" className="text-red-500">
+            <Link to="/about" className="text-red-500">
               About Us
             </Link>
-            <Link to="/" className="text-red-500">
-              Log In
-            </Link>
+
+            {/* {SignedIn ? (
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            ) : (
+              <p>k</p>
+            )}
+              <Link to="/sign-in" className="text-red-500">
+                <SignInButton/>
+              </Link> */}
+
             <Link to="/generateImage" className="text-red-500">
               Generate Image
             </Link>
+
+            <SignedOut>
+              <Link to="/sign-in" className="text-red-500">
+                {/* <SignInButton /> */}
+                Sign In
+              </Link>
+            </SignedOut>
+
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+
+            {/* <div className=" text-red-500"> */}
+            {/* <SignedOut
+                appearance={{
+                  baseTheme: dark,
+                }}
+              >
+                <SignInButton />
+              </SignedOut>
+
+              <SignedIn
+                appearance={{
+                  baseTheme: dark,
+                }}
+                path="/sign-in"
+                routing="path"
+                signUpUrl="/sign-up"
+              >
+                <UserButton />
+              </SignedIn> */}
+
+            {/* <SignIn
+                appearance={{
+                  baseTheme: dark,
+                }}
+              >
+                <SignInButton />
+              </SignIn> */}
+
+            {/* <SignInButton>
+              </SignInButton> */}
+            {/* </div> */}
           </div>
         </nav>
       </section>
