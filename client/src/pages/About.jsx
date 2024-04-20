@@ -1,5 +1,5 @@
 import React from "react";
-import { a1, a2, a3, a4 } from "../components/Image";
+import { a1, a10, a2, a3, a4,a5,a6,a7,a8,a9 } from "../components/Image";
 
 const About = () => {
   return (
@@ -11,7 +11,7 @@ const About = () => {
               <div className="flex items-center -mx-3 sm:-mx-4">
                 <div className="w-full px-3 sm:px-4 xl:w-1/2">
                   <div className="py-3 sm:py-4">
-                    <img src={a2} alt="" className="w-full rounded-2xl" />
+                    <img src={a5} alt="" className="w-full rounded-2xl" />
                   </div>
                   <div className="py-3 sm:py-4">
                     <img src={a3} alt="" className="w-full rounded-2xl" />
@@ -19,7 +19,7 @@ const About = () => {
                 </div>
                 <div className="w-full px-3 sm:px-4 xl:w-1/2">
                   <div className="relative z-10 my-4">
-                    <img src={a4} alt="" className="w-full rounded-2xl" />
+                    <img src={a7} alt="" className="w-full rounded-2xl" />
                     <span className="absolute -right-7 -bottom-7 z-[-1]">
                       <svg
                         width={134}
@@ -597,7 +597,7 @@ const About = () => {
 
             <div className="w-full px-4 lg:w-1/2 xl:w-5/12">
               <div className="mt-10 lg:mt-0">
-                <span className="block mb-4 text-indigo-500 font-bold tracking-wide text-lg underline underline-offset-8 text-primary">
+                <span className="block mb-4 text-indigo-600 font-bold tracking-wide text-lg underline underline-offset-8 text-primary">
                   Why Choose Us
                 </span>
                 <h2 className="mb-5 text-3xl font-bold text-indigo-400 sm:text-[40px]/[48px]">

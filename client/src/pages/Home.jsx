@@ -1,4 +1,6 @@
 import "../App.css";
+import Features from "../components/Features";
+import UseCases from "../components/UseCases";
 const Home = () => {
   function handleMouseEnter() {
     let showHide = document.getElementById("showHide");
@@ -116,6 +118,10 @@ const Home = () => {
             </button>
           </div>
         </div>
+
+        {/* other components */}
+        <UseCases />
+        <Features />
       </main>
     </>
   );
