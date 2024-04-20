@@ -157,6 +157,12 @@ input[type="number"]::-webkit-outer-spin-button {
   /* background: -webkit-linear-gradient(to right, #2e98b8, #f135e4, #bb901b); */
   background: linear-gradient(#390570, #9d3442, #8a2387);
 }
+
+.mainBgF {
+  /* background: #8a2387; */
+  /* background: -webkit-linear-gradient(to right, #2e98b8, #f135e4, #bb901b); */
+  background: linear-gradient(#2b012a,#140326, #170104);
+}
 .div1 {
   filter: blur(0.5px);
 }
