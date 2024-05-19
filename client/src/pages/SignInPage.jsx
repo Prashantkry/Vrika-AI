@@ -12,7 +12,7 @@ import { setUserId } from "../Redux/SignIn";
 
 // TODO add email or userId redux store and control refresh data
 
-const APIUrl = "http://localhost:5000/api/v1";
+const APIUrl = "https://vrika.onrender.com/api/v1";
 
 export default function SignInPage() {
   const [cookies, setCookie] = useCookies(["token"]);

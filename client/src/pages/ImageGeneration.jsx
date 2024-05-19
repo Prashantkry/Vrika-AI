@@ -32,7 +32,8 @@ const ImageGeneration = () => {
   axios.defaults.withCredentials = true;
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/v1/generateImageT3DM")
+      // .get("https://vrika.onrender.com/api/v1/generateImageT3DM")
+      .get("https://vrika.onrender.com/api/v1/generateImageT3DM")
       .then((res) => {
         console.log("res -> ", res);
         if (res.data.valid === true) {
@@ -278,7 +279,7 @@ const ImageGeneration = () => {
     };
     console.log(backendContent);
 
-    const response = await fetch("http://localhost:5000/api/v1/generateImage", {
+    const response = await fetch("https://vrika.onrender.com/api/v1/generateImage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

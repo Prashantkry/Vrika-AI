@@ -12,7 +12,7 @@ export const Plans = () => {
   console.log(userId);
 
   const handlePayment = async () => {
-    const paymentData = await fetch("http://localhost:5000/api/v1/payment", {
+    const paymentData = await fetch("https://vrika.onrender.com/api/v1/payment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

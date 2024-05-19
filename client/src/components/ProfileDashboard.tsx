@@ -31,7 +31,7 @@ const ProfileDashboard = () => {
     console.log('useeffect ..............')
     const fetchProfileData = async () => {
       console.log('fontend')
-      const ProfileFetchedData = await fetch('http://localhost:5000/api/v1/getProfileData', {
+      const ProfileFetchedData = await fetch('https://vrika.onrender.com/api/v1/getProfileData', {
         method: 'POST',
         headers: {
           'Content-Type': "application/json"
@@ -63,7 +63,7 @@ const ProfileDashboard = () => {
   useEffect(() => {
     const generatedImages = async () => {
       console.log('trig')
-      const res = await fetch('http://localhost:5000/api/v1/getAllGeneratedImagesData', {
+      const res = await fetch('https://vrika.onrender.com/api/v1/getAllGeneratedImagesData', {
         method: 'POST',
         headers: {
           'Content-Type': "application/json"
