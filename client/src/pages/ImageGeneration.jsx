@@ -33,7 +33,7 @@ const ImageGeneration = () => {
   useEffect(() => {
     axios
       // .get("https://vrika.onrender.com/api/v1/generateImageT3DM")
-      .get("https://vrika.onrender.com/api/v1/generateImageT3DM")
+      .get("https://vrika.onrender.com/api/v1generateImageT3DM")
       .then((res) => {
         console.log("res -> ", res);
         if (res.data.valid === true) {

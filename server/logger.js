@@ -6,13 +6,13 @@ const logger = winston.createLogger({
         space: 4
     }),
     transports: [
-        new winston.transports.File({  // create a folder & logs all data.
-            filename: "logs/all.log"
-        }),
-        new winston.transports.File({  // create a folder & logs all error data.
-            filename: "logs/error.log",
-            level: "error"
-        }),
+        // new winston.transports.File({  // create a folder & logs all data.
+        //     filename: "logs/all.log"
+        // }),
+        // new winston.transports.File({  // create a folder & logs all error data.
+        //     filename: "logs/error.log",
+        //     level: "error"
+        // }),
     ]
 })
 
