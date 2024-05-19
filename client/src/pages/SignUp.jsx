@@ -4,7 +4,7 @@ import "../App.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const APIUrl = "https://vrika.onrender.com/api/v1";
+const APIUrl = "https://vrika-ai.onrender.com/api/v1";
 
 export default function SignUpPage() {
   // image work start
