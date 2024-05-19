@@ -83,6 +83,13 @@
   }
 }
 
+.blurChoosedImage {
+}
+
+#showAllButton {
+  display: none;
+}
+
 .arizonia_regular {
   font-family: "Arizonia", cursive;
   font-weight: 400;
@@ -164,7 +171,6 @@ input[type="number"]::-webkit-outer-spin-button {
   background: linear-gradient(#2b012a, #140326, #170104);
 }
 
-
 .div1 {
   filter: blur(0.5px);
 }
@@ -201,4 +207,169 @@ input[type="number"]::-webkit-outer-spin-button {
     rgba(255, 255, 255, 0.18),
     rgba(0, 0, 0, 0.37)
   );
+}
+
+.WhyChooseUs{
+  color: #774ac5;
+}
+
+/* loader start*/
+.loader {
+  width: 44px;
+  height: 44px;
+  position: relative;
+  background: #a39e9e;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.loader:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  transform: rotate(45deg) translate(30%, 40%);
+  background: #740b91;
+  box-shadow: 32px -34px 0 5px #3a0f86;
+  animation: slide 2s infinite ease-in-out alternate;
+}
+
+.loader:after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #5e109a;
+  transform: rotate(0deg);
+  transform-origin: 35px 145px;
+  animation: rotate 2s infinite ease-in-out;
+}
+
+@keyframes slide {
+  0%,
+  100% {
+    bottom: -35px;
+  }
+
+  25%,
+  75% {
+    bottom: -2px;
+  }
+
+  20%,
+  80% {
+    bottom: 2px;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(-15deg);
+  }
+
+  25%,
+  75% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(25deg);
+  }
+}
+
+/* loader end*/
+
+/* #imageChoosed{
+  display: none;
+} */
+
+/* 2xl ++++*/
+@media (min-width: 1536px) {
+  /* making home page responsive  */
+  .title {
+    font-size: 200px;
+  }
+  .titleS {
+    font-size: 150px;
+    color: rgb(0, 255, 85);
+  }
+}
+
+/* 2xl */
+@media (min-width: 1281px) and (max-width: 1536px) {
+  .title {
+    font-size: 200px;
+  }
+  .titleS {
+    font-size: 150px;
+    color: rgb(0, 255, 85);
+  }
+}
+
+/* xl */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .title {
+    font-size: 180px;
+    color: red;
+  }
+  .titleS {
+    font-size: 120px;
+  }
+}
+
+/* lg */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .title {
+    font-size: 150px;
+  }
+  .titleS {
+    font-size: 100px;
+    color: rgb(0, 242, 255);
+  }
+}
+
+/* md */
+@media (min-width: 641px) and (max-width: 768px) {
+  .title {
+    font-size: 120px;
+    color: rgb(255, 255, 0);
+  }
+  .titleS {
+    font-size: 80px;
+  }
+  .GetStartedFree {
+    font-size: 30px;
+  }
+}
+
+/* sm */
+@media (max-width: 640px) {
+  .title {
+    font-size: 90px;
+    color: rgb(153, 50, 65);
+  }
+  .titleS {
+    font-size: 60px;
+  }
+  .threeTags {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left: 40vw;
+    padding-right: 40vw;
+  }
+  .svgH {
+    width: "20px";
+    height: "20px";
+    margin-top: 0px;
+  }
+  .GetStartedFree {
+    font-size: 23px;
+    padding: 15px;
+  }
 }

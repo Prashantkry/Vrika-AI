@@ -3,47 +3,58 @@ import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useCookies } from "react-cookie";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setSignedIn } from "../Redux/SignIn";
+import { setEmail } from "../Redux/SignIn";
+import { setUserId } from "../Redux/SignIn";
 
-const APIUrl = "http://localhost:8000/api/v1";
+// TODO add email or userId redux store and control refresh data
+
+const APIUrl = "http://localhost:5000/api/v1";
 
 export default function SignInPage() {
+  const [cookies, setCookie] = useCookies(["token"]);
+
+  axios.defaults.withCredentials = true;
+
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
   // normal sign In
   const sendSignIn = async () => {
     let Email = document.getElementById("email").value;
     let Password = document.getElementById("pass").value;
-    // console.log(Email, Password);
+    console.log(Email, Password);
 
     try {
-      const data = await fetch(`${APIUrl}/SignIn`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Email,
-          Password,
-        }),
+      const data = await axios.post(`${APIUrl}/signIn`, {
+        Email,
+        Password,
       });
-      const receivedData = await data.json();
-      console.log(receivedData);
-      const UserId = receivedData.UserId;
-      const Role = receivedData.Role;
-      localStorage.setItem("UserId", UserId);
-      localStorage.setItem("Role", Role);
+      console.log("data", data);
 
-      if (receivedData.message === "LoginS") {
+      const UserId = data.data.UserId;
+      const UserEmail = data.UserEmail;
+
+      if (data.data.success === true) {
         toast.success("Login Successful");
+        
         setTimeout(() => {
-          navigate(`/?UserId=${UserId}`);
-          window.location.href = "/";
+          navigate(`/`);
         }, 1000);
-      } else if (receivedData.message === "passW") {
-        toast.warning("Wrong Password");
+        dispatch(setSignedIn(true));
+        dispatch(setEmail(Email));
+        console.log(UserId);
+        dispatch(setUserId(UserId));
+      } else if (data.data.success === false) {
+        toast.warning("Wrong email or password");
       } else {
         toast.warning("No account found create account");
       }
-      // console.log(receivedData);
+      // console.log(data);
     } catch (err) {
       console.log(err);
     }
@@ -58,10 +69,10 @@ export default function SignInPage() {
   return (
     <>
       <ToastContainer />
-      <div className="bg-gray-950 h-[92vh] ">
+      <div className="bg-gray-950 h-[84vh] ">
         <div className="xl:px-20 md:px-10 sm:px-6 px-4 md:py-12 py-9 2xl:mx-auto 2xl:container md:flex items-center justify-center signIn">
           {/* login form start */}
-          <div className="bg-gray-800 shadow-lg rounded mt-10 xl:w-1/3 lg:w-5/12 md:w-1/2 w-full lg:px-10 sm:px-6 sm:py-10 px-2 py-6">
+          <div className="bg-gray-900 shadow-lg rounded mt-10 xl:w-1/3 lg:w-5/12 md:w-1/2 w-full lg:px-10 sm:px-6 sm:py-10 px-2 py-6">
             <p
               tabIndex={0}
               className="focus:outline-none text-2xl tracking-wider font-bold leading-6 text-gray-300"
@@ -72,7 +83,7 @@ export default function SignInPage() {
               tabIndex={0}
               className="focus:outline-none text-sm mt-4 h-[2vh] flex justify-between items-center border-0 font-medium leading-none text-gray-500"
             >
-              <span className="">Dont have account?</span>
+              <span className="">Don't have account?</span>
               <Link
                 to="/signUp"
                 className="hover:text-gray-500 border-0 focus:text-gray-500 focus:outline-none focus:underline hover:underline text-sm font-medium leading-none text-gray-500 cursor-pointer"
@@ -126,7 +137,7 @@ export default function SignInPage() {
             <div>
               <label
                 htmlFor="email"
-                className="text-sm font-medium leading-none text-gray-800"
+                className="text-sm font-medium leading-none text-gray-400"
               >
                 Email
               </label>
@@ -141,7 +152,7 @@ export default function SignInPage() {
             <div className="mt-6 w-full">
               <label
                 htmlFor="pass"
-                className="text-sm font-medium leading-none text-gray-800"
+                className="text-sm font-medium leading-none text-gray-400"
               >
                 Password
               </label>

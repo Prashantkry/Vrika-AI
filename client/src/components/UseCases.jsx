@@ -112,19 +112,6 @@ const UseCases = () => {
                 <div className=" h-[48vh] w-[40vw] border-0 border-teal-950 p-4">
                   {/* <!-- <img src="aero.png" alt="" className="border-0 h-[10vh] w-[20vw] inline ml-[50%]" /> --> */}
                   <div className="flex w-[60vw] h-[25vh]">
-                    {/* <!-- base image start --> */}
-                    {/* <div className="border-4 border-gray-800 rounded-md h-fit w-[13vw] mt-4">
-                      <p className="text-center p-1 bg-gray-900 text-white tracking-widest">
-                        Base Image
-                      </p>
-                      <img
-                        src={a2}
-                        className=" border-0 object-contain w-full"
-                        alt=""
-                      />
-                    </div> */}
-                    {/* <!-- base image end --> */}
-
                     {/* <!-- prompt start  --> */}
                     <div className="relative border-4 w-[18.7vw] h-full ml-0 mt-4 p-0 bg-gray-900 text-white border-gray-800 rounded-md">
                       <p className="abolute w-full bg-gray-950 pt-0 text-center text-lg tracking-widest">
@@ -200,19 +187,6 @@ const UseCases = () => {
                 <div className=" h-[48vh] w-[40vw] border-0 border-teal-950 p-4">
                   {/* <!-- <img src="aero.png" alt="" className="border-0 h-[10vh] w-[20vw] inline ml-[50%]" /> --> */}
                   <div className="flex w-[60vw] h-[25vh]">
-                    {/* <!-- base image start --> */}
-                    {/* <div className="border-4 border-gray-800 rounded-md h-fit w-[13vw] mt-4">
-                      <p className="text-center p-1 bg-gray-900 text-white tracking-widest">
-                        Base Image
-                      </p>
-                      <img
-                        src={a2}
-                        className=" border-0 object-contain w-full"
-                        alt=""
-                      />
-                    </div> */}
-                    {/* <!-- base image end --> */}
-
                     {/* <!-- prompt start  --> */}
                     <div className="relative border-4 w-[18.7vw] h-full ml-0 mt-4 p-0 bg-gray-900 text-white border-gray-800 rounded-md">
                       <p className="abolute w-full bg-gray-950 pt-0 text-center text-lg tracking-widest">
@@ -288,19 +262,6 @@ const UseCases = () => {
                 <div className=" h-[48vh] w-[40vw] border-0 border-teal-950 p-4">
                   {/* <!-- <img src="aero.png" alt="" className="border-0 h-[10vh] w-[20vw] inline ml-[50%]" /> --> */}
                   <div className="flex w-[60vw] h-[25vh]">
-                    {/* <!-- base image start --> */}
-                    {/* <div className="border-4 border-gray-800 rounded-md h-fit w-[13vw] mt-4">
-                      <p className="text-center p-1 bg-gray-900 text-white tracking-widest">
-                        Base Image
-                      </p>
-                      <img
-                        src={a2}
-                        className=" border-0 object-contain w-full"
-                        alt=""
-                      />
-                    </div> */}
-                    {/* <!-- base image end --> */}
-
                     {/* <!-- prompt start  --> */}
                     <div className="relative border-4 w-[18.7vw] h-full ml-0 mt-4 p-0 bg-gray-900 text-white border-gray-800 rounded-md">
                       <p className="abolute w-full bg-gray-950 pt-0 text-center text-lg tracking-widest">
@@ -377,19 +338,6 @@ const UseCases = () => {
                 <div className=" h-[48vh] w-[40vw] border-0 border-teal-950 p-4">
                   {/* <!-- <img src="aero.png" alt="" className="border-0 h-[10vh] w-[20vw] inline ml-[50%]" /> --> */}
                   <div className="flex w-[60vw] h-[25vh]">
-                    {/* <!-- base image start --> */}
-                    {/* <div className="border-4 border-gray-800 rounded-md h-fit w-[13vw] mt-4">
-                      <p className="text-center p-1 bg-gray-900 text-white tracking-widest">
-                        Base Image
-                      </p>
-                      <img
-                        src={a2}
-                        className=" border-0 object-contain w-full"
-                        alt=""
-                      />
-                    </div> */}
-                    {/* <!-- base image end --> */}
-
                     {/* <!-- prompt start  --> */}
                     <div className="relative border-4 w-[18.7vw] h-full ml-0 mt-4 p-0 bg-gray-900 text-white border-gray-800 rounded-md">
                       <p className="abolute w-full bg-gray-950 pt-0 text-center text-lg tracking-widest">

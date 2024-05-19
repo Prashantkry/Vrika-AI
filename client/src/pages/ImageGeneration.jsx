@@ -1,34 +1,54 @@
-import React, { useEffect, useState } from "react";
-import w2, { down, right, w1, w3, w4, w5 } from "../components/Image";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import w2, {
+  down,
+  right,
+  w1,
+  w3,
+  w4,
+  w5,
+  a1,
+  a2,
+  a3,
+  a4,
+  a5,
+} from "../components/Image";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import ProfileDashboard from "../components/ProfileDashboard";
+import { useSelector } from "react-redux";
 
 let maxLimit = 500;
 let textContent = "";
 let nTextContent = "";
+let inputFile;
+let imageData;
 
-let imageArray = [w1, w3, w4, w5, w2];
+let imageArray = [w1, w3, w4, w5, w2, a1, a2, a3, a4, a5];
 
-// handling prompt data reset start   // TODO may ill do later
-function resetInput(inputId) {
-  var inputElement = document.getElementById(inputId);
-  if (inputElement) {
-    inputElement.value = "";
-    remainingCharacters = 150;
-  }
-}
-function resetInputN(inputId) {
-  var inputElement = document.getElementById(inputId);
-  if (inputElement) {
-    inputElement.value = "";
-    nRemainingCharacters = 150;
-  }
-}
-// handling prompt data reset end
+const ImageGeneration = () => {
+  // check authorization 1st start
+  const [setMessage] = useState();
+  const navigate = useNavigate();
+  axios.defaults.withCredentials = true;
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/v1/generateImageT3DM")
+      .then((res) => {
+        console.log("res -> ", res);
+        if (res.data.valid === true) {
+          setMessage(res.data.message);
+        } else {
+          navigate("/signIn");
+        }
+      })
+      .catch((err) => console.log(err));
+  }, []);
+  // check authorization 1st end
 
-const ThreeDModelImage = () => {
   const [positivePrompts, setPositivePrompts] = useState("");
   const [negativePrompts, setNegativePrompts] = useState("");
-  const [image, setImage] = useState();
+  const [image, setImage] = useState([]);
+  // const [image, setImage] = useState([]);
   const [isPromptVisible, setIsPromptVisible] = useState(true);
   const [isSettingVisible, setIsSettingVisible] = useState(true);
   const [isGeneratedVisible, setIsGeneratedVisible] = useState(false);
@@ -36,17 +56,28 @@ const ThreeDModelImage = () => {
   const [remainingCharacters, setRemainingCharacters] = useState(maxLimit);
   const [nRemainingCharacters, setNRemainingCharacters] = useState(maxLimit);
 
-  const [promptWeight, setPromptWeight] = useState("");
-  const [ControlWeight, setControlWeight] = useState("");
-  const [ImagesNosCount, setImagesNosCount] = useState("");
+  const [promptWeight, setPromptWeight] = useState(0);
+  const [ControlWeight, setControlWeight] = useState(0);
+  const [ImagesNosCount, setImagesNosCount] = useState(0);
+  const [ImagesChange, setImagesChange] = useState(0); // for blur effect
+  const [seed, setSeed] = useState(-1);
 
   const [help, setHelp] = useState(false);
 
   const [showProject, setShowProject] = useState(false);
   const [showImageGenerationAndTools, setShowImageGenerationAndTools] =
     useState(true);
+  const [showSettings, setShowSettings] = useState(true);
+  const [showChoosedImage, setShowChoosedImage] = useState(true);
 
-  const [activeTab, setActiveTab] = useState("project");
+  const [showImageGeneration, setShowImageGeneration] = useState(false);
+
+  const [imageChosen, setImageChosen] = useState(false);
+  const [imageSrc, setImageSrc] = useState(""); // image choosed
+
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
 
   // handle remianing characters in prompts textarea
   function handleTextRemainingCharacters(text, isNegative = false) {
@@ -79,7 +110,11 @@ const ThreeDModelImage = () => {
   // handle random value of seed
   function handleRandom() {
     const randomValue = Math.floor(Math.random() * 4294967297);
-    document.getElementById("resetButton").value = randomValue;
+    setSeed(randomValue);
+  }
+
+  function handleReset() {
+    setSeed(-1);
   }
 
   // handle input change
@@ -92,42 +127,21 @@ const ThreeDModelImage = () => {
         setControlWeight(0);
       } else if (type === "ImagesNos") {
         setImagesNosCount(0);
+      } else if (type === "ImagesChange") {
+        setImagesChange(0);
       }
     } else {
       if (type === "prompt") {
         setPromptWeight(parseInt(value));
       } else if (type === "control") {
-        setControlWeight(parseInt(value));
+        setControlWeight(value);
       } else if (type === "ImagesNos") {
         setImagesNosCount(parseInt(value));
+      } else if (type === "ImagesChange") {
+        setImagesChange(parseInt(value));
       }
     }
   };
-
-  // Function to handle changes in the input box
-  const handleInputChange = (type, event) => {
-    const value = event.target.value;
-    if (type === "prompt") {
-      setPromptWeight(value);
-    } else if (type === "control") {
-      setControlWeight(value);
-    } else if (type === "ImagesNos") {
-      setImagesNosCount(value);
-    }
-  };
-
-  // reset all input value or range
-  function handleReset(type) {
-    if (type === "seed") {
-      document.getElementById("resetButton").value = "";
-    } else if (type === "ImagesNos") {
-      setImagesNosCount(0);
-    } else if (type === "Prompt") {
-      setPromptWeight(0);
-    } else if (type === "Control") {
-      setControlWeight(0);
-    }
-  }
 
   // handle open closen of right side tool help section
   function toggleHelp() {
@@ -139,155 +153,281 @@ const ThreeDModelImage = () => {
   }
 
   function toggleDashboard() {
+    setShowChoosedImage(true);
     setShowProject(false);
     setShowImageGenerationAndTools(true);
+    setShowSettings(true);
+    let imageChoosed = document.getElementById("imageChoosed");
+    imageChoosed.style.display = "block";
   }
   function toggleProject() {
     setShowProject(true);
     setShowImageGenerationAndTools(false);
+    setShowSettings(false);
+    setShowChoosedImage(false);
   }
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
+  // ! drag and drop for image and 3-D model in image generation dashboard start
 
-  // drag and drop for image and 3-D model in image generation dashboard start
+  function enableDragAndDrop() {
+    const dropArea = document.getElementById("dropAreaBig");
 
-  // const [changeDivOnImageChange, setChangeDivOnImageChange] = useState(true);
-  // const [fileData3D, setFileData3D] = useState(null);
-  // const [fileData, setFileData] = useState('');
-  // const [fileExtension, setFileExtension] = useState('');
-  // const [fileExtension_, setFileExtension_] = useState('');
-  // const ThreeJsPart_ = document.getElementById("ThreeJsPart");
-  // const ImagePart_ = document.getElementById("ImagePart");
-  // let Editor3D;
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
 
-  // let filebg = document.getElementById("file_bigger");
-  // let flabelbg = document.getElementById("filebg_label");
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
 
-  // const startListenerChooseImage = (event) => {
-  //   const fileList = event.target.files;
-  //   const fileName = fileList[0].name;
-  //   setFileData3D(fileList);
-  //   setFileData(fileName);
-  //   setFileExtension(fileName.split(".").pop());
+    dropArea.addEventListener("drop", handleDrop, false);
 
-  //   // calling load function to access 3-D model
-  //   Editor3D.loadFiles(fileList);
+    const fileLabel = document.querySelector("#filebg_label");
+    inputFile = document.getElementById("file_bigger");
+    inputFile.addEventListener("change", function () {
+      // * --------------------- choosing file ---------------------
+      if (inputFile.files.length > 0) {
+        console.log("first");
+        fileLabel.textContent = inputFile.files[0].name;
+        console.log("imageSrc -> ", imageSrc);
+        setImageChosen(true);
+        console.log("imageChosen:", imageChosen);
+        const reader = new FileReader();
+        console.log("reader -> ", reader);
+        reader.onload = (es) => {
+          const imageSrc = es.target.result;
+          // console.log("imageSrc -> ", imageSrc);
+          setImageSrc(imageSrc);
+        };
+        reader.readAsDataURL(inputFile.files[0]);
+      } else {
+        resetChoosedImageData();
+        fileLabel.textContent = "Choose File";
+      }
+    });
+  }
 
-  //   if (fileExtension === "glb") {
-  //     ThreeJsPart_.style.display = "flex";
-  //     ImagePart_.style.display = "none";
-  //   }
+  function handleDrop(e) {
+    console.log("handleDrop called");
+    e.preventDefault();
+    e.stopPropagation();
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    const fileLabel = document.querySelector("#filebg_label");
+    const inputFile = document.getElementById("file_bigger");
+    inputFile.files = files;
+    fileLabel.textContent = files[0].name;
 
-  //   const reader = new FileReader();
-  //   reader.onload = (e) => {
-  //     setChangeDivOnImageChange(false);
+    // Set imageChosen to true
+    setImageChosen(true);
+    console.log("imageChosen:", imageChosen);
+    const reader = new FileReader();
+    reader.onload = (es) => {
+      const imageSrc = es.target.result;
+      console.log(imageSrc);
+      setImageSrc(imageSrc);
+    };
+    reader.readAsDataURL(files[0]);
+  }
 
-  //     setTimeout(() => {
-  //       let x = document.getElementById("handleChnageImageData");
-  //       x.src = e.target.result;
-  //     }, 1000);
-  //   };
-  //   reader.readAsDataURL(fileList[0]);
-  // }
-  // choose image from anywhere in div  start
-  // const chooseImage = () => {
-  //   let dropAreaBig__ = document.getElementById("dropAreaBig");
-  //   document.getElementById("file_bigger").click();
-  // };
-  // choose image from anywhere in div end
+  function highlight(e) {
+    const dropArea = document.getElementById("dropAreaBig");
+    dropArea.style.backgroundColor = "#2d3748";
+    e.preventDefault();
+  }
 
-  // startListenerChooseImage();
+  function unhighlight(e) {
+    const dropArea = document.getElementById("dropAreaBig");
+    dropArea.style.backgroundColor = "";
+    e.preventDefault();
+  }
 
-  // const enableDragandDropbg = () => {
-  //   let dropAreabg = document.getElementById("dropAreaBig");
-  //   let inputFilebg = document.getElementById("file_bigger");
+  useEffect(() => {
+    enableDragAndDrop();
+  }, []);
 
-  //   dropAreabg.addEventListener("drop", handleDropbg, false);
-  //   let fileLabel = document.querySelector('label[id="filebg_label"]');
+  // ! drag and drop for image and 3-D model in image generation dashboard end
 
-  //   if (inputFilebg.files.length > 0) {
-  //     fileLabel.textContent = inputFilebg.files[0].name;
-  //   } else {
-  //     fileLabel.textContent = "Choose File";
-  //   }
-  // };
+  // get user id form redux store start
+  let userId = useSelector((state) => state.Login.UserId);
+  // end
 
-  // const highlightbg = (e) => {
-  //   let dropAreabg = document.getElementById("dropAreaBig");
-  //   dropAreabg.style.backgroundColor = "#2d3748";
-  //   e.preventDefault();
-  // };
-
-  // const unhighlightbg = (e) => {
-  //   let dropAreabg = document.getElementById("dropAreaBig");
-  //   dropAreabg.style.backgroundColor = "";
-  //   e.preventDefault();
-  // };
-
-  // const handleDropbg = (e) => {
-  //   let dtbg = e.dataTransfer;
-  //   let filesbg = dtbg.files;
-  //   let fileLabel = document.querySelector('label[id="filebg_label"]');
-  //   let inputFile = document.getElementById("file_bigger");
-  //   inputFile.files = filesbg;
-  //   fileLabel.textContent = filesbg[0].name;
-  //   fileData3D = filesbg;
-
-  //   fileData = fileLabel.textContent;
-  //   fileExtension_ = fileData.split(".").pop();
-
-  //   if (fileExtension_ === "glb") {
-  //     ThreeJsPart_.style.display = "flex";
-  //     ImagePart_.style.display = "none";
-  //   }
-
-  //   // calling load function to access 3-D model
-  //   Editor3D.loadFiles(fileData3D);
-
-  //   const reader = new FileReader();
-  //   reader.onload = (es) => {
-  //     setChangeDivOnImageChange(false);
-
-  //     setTimeout(() => {
-  //       let x = document.getElementById("handleChnageImageData");
-  //       x.src = es.target.result;
-  //     }, 1000);
-  //   };
-  //   reader.readAsDataURL(filesbg[0]);
-  //   unhighlightbg(e);
-  // };
-
-  // enableDragandDropbg();
-  // drag and drop for image and 3-D model in image generation dashboard end
-
+  // ! generate imasge start
   const generate = async () => {
-    console.log("forntend triggered");
-    console.log("Positive Prompts", positivePrompts);
+    setIsGenerating(true);
+    setIsGeneratedVisible(true);
+    setIsSettingVisible(false);
+    setIsPromptVisible(true);
+    setShowProject(false);
+    setShowImageGeneration(true);
 
-    // const url = "http://localhost:5000/api/generateImage";
-    const url = "https://vrika-ai.onrender.com/api/generateImage";
-    const result = await fetch(url, {
+    console.log(userId);
+
+    const backendContent = {
+      textContent:
+        positivePrompts ||
+        "realistic, cinematic lighting, photorealistic, hyper-realistic, 3d rendering, render, 8k, 16k, extremely detailed, unreal engine, octane, maya",
+      nTextContent:
+        negativePrompts ||
+        "blurry, (distorted), unrealistic, white floor, untextured, cars",
+      seed: seed.toString() || "-1",
+      guidance_scale: promptWeight || 1,
+      num_outputs: ImagesNosCount || 1,
+      controlnet_conditioning_scale: ControlWeight || 1,
+      UserID_: userId,
+    };
+    console.log(backendContent);
+
+    const response = await fetch("http://localhost:5000/api/v1/generateImage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        positivePrompts,
-        negativePrompts,
+        backendContent,
       }),
     });
-    const data = await result.json();
-    console.log("Generated Image Data", data);
-    setImage("data:image/png;base64," + data.result.result);
+    const apiRes = await response.json();
+    console.log("apiRes => ", apiRes);
+    const imageData = apiRes.imageData.ImageDataGenAi;
+    console.log("imageData => ", imageData);
+    setImage((prevImages) => [...prevImages, ...imageData]);
+    console.log(image);
+    setIsGenerating(false);
+
+    // for mongo db extractions
+    const InfoJson = {
+      input: {
+        controlnet_1: apiRes.imageData.GenAiImageData.input.controlnet_1,
+        controlnet_1_conditioning_scale:
+          apiRes.imageData.GenAiImageData.input.controlnet_1_conditioning_scale,
+        controlnet_1_end:
+          apiRes.imageData.GenAiImageData.input.controlnet_1_end,
+        controlnet_1_start:
+          apiRes.imageData.GenAiImageData.input.controlnet_1_start,
+        controlnet_2: apiRes.imageData.GenAiImageData.input.controlnet_2,
+        controlnet_2_conditioning_scale:
+          apiRes.imageData.GenAiImageData.input.controlnet_2_conditioning_scale,
+        controlnet_2_end:
+          apiRes.imageData.GenAiImageData.input.controlnet_2_end,
+        controlnet_2_start:
+          apiRes.imageData.GenAiImageData.input.controlnet_2_start,
+        guidance_scale: apiRes.imageData.GenAiImageData.input.guidance_scale,
+        height: apiRes.imageData.GenAiImageData.input.height,
+        width: apiRes.imageData.GenAiImageData.input.width,
+        prompt: apiRes.imageData.GenAiImageData.input.prompt,
+        negative_prompt: apiRes.imageData.GenAiImageData.input.negative_prompt,
+        num_inference_steps:
+          apiRes.imageData.GenAiImageData.input.num_inference_steps,
+        num_outputs: apiRes.imageData.GenAiImageData.input.num_outputs,
+        refine: apiRes.imageData.GenAiImageData.input.refine,
+        refine_steps: apiRes.imageData.GenAiImageData.input.refine_steps,
+        scheduler: apiRes.imageData.GenAiImageData.input.scheduler,
+        seed: apiRes.imageData.GenAiImageData.input.seed,
+        sizing_strategy: apiRes.imageData.GenAiImageData.input.sizing_strategy,
+      },
+      created_at: apiRes.imageData.GenAiImageData.created_at,
+      started_at: apiRes.imageData.GenAiImageData.started_at,
+      completed_at: apiRes.imageData.GenAiImageData.completed_at,
+      metrics: {
+        predict_time: apiRes.imageData.GenAiImageData.metrics.predict_time,
+      },
+      images: apiRes.imageData.GenAiImageData.output,
+    };
+    console.log("InfoJson => ", InfoJson);
   };
+  // ! end
+
+  // ! showing image data in main view port start
+  const showImage = (index) => {
+    imageData = image[index];
+    console.log(index);
+    if (index === selectedImageIndex) {
+      // Toggle through images if the same image is clicked
+      setSelectedImageIndex((prevIndex) =>
+        prevIndex === image.length - 1 ? 0 : prevIndex + 1
+      );
+    } else {
+      setSelectedImageIndex(index);
+    }
+  };
+
+  useEffect(() => {
+    if (image.length > 0 && selectedImageIndex === null) {
+      setSelectedImageIndex(0);
+    }
+  }, [image, selectedImageIndex]);
+  // end
+
+  // resetChoosedImageData start
+  function resetChoosedImageData() {
+    setImageSrc("");
+    setImageChosen(false);
+  }
+  // resetChoosedImageData end
+
+  // removeImageVIewPort start
+  function removeImageVIewPort() {
+    setSelectedImageIndex("");
+  }
+  // removeImageVIewPort end
+
+  // show image generated info
+  function showImageGeneratedInfo(sendImageInformations) {
+    // console.log('iData showImageGeneratedInfo -> ',iData)
+    console.log("iData showImageGeneratedInfo -> ", sendImageInformations);
+    let imageInfoData_ = document.getElementById("imageInfoData_");
+    let displayStyle = window
+      .getComputedStyle(imageInfoData_)
+      .getPropertyValue("display");
+
+    if (displayStyle === "none") {
+      imageInfoData_.style.display = "block";
+    } else {
+      imageInfoData_.style.display = "none";
+    }
+
+    // imageInfoData = {
+    // imageInfoDataPrompt = sendImageInformations.Prompt;
+    // imageInfoDataNegativePrompt = sendImageInformations.NegativePrompt;
+    // imageInfoDataPromptWeight = sendImageInformations.PromptWeight;
+    // imageInfoDataControlWeight = sendImageInformations.ControlWeight;
+    // imageInfoDataSeed = sendImageInformations.seed;
+    // imageInfoDatatype = sendImageInformations.type;
+    // console.log(imageInfoData);
+  }
+
+  // download image start
+  async function downloadImage(iData) {
+    console.log("iData downloadImage -> ", iData);
+    const image = await fetch(iData);
+    const imageBlog = await image.blob();
+    const imageURL = URL.createObjectURL(imageBlog);
+
+    const link = document.createElement("a");
+    link.href = imageURL;
+    link.download = "download";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+  // download image end
+
+  // replicate image data from 1 to another start
+  async function handleReplicateImage(sendImageInformations) {
+    console.log("handleReplicateImage -> ", sendImageInformations);
+    textContent = sendImageInformations.Prompt;
+    nTextContent = sendImageInformations.NegativePrompt;
+    PromptCount = sendImageInformations.PromptWeight;
+    setControlWeight(sendImageInformations.ControlWeight);
+    setSeed(sendImageInformations.seed);
+  }
+  // replicate image data from 1 to another end
 
   return (
     <>
       <main>
         <div className="relative border-0 h-[92vh] p-2 w-full bg-slate-950">
-          {/* <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#161616_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div> */}
           <div className="flex flex-row-reverse h-full items-center justify-between">
             {/* side tools start*/}
             <div className="w-[3.5vw] rounded h-full ml-2 -mr-1 border-0 bg-gray-900 flex items-center justify-between py-5 flex-col">
@@ -431,110 +571,161 @@ const ThreeDModelImage = () => {
             {/* side tools end*/}
 
             {/* home screen main view start  */}
-            {/* image view start */}
-            {/* <div
-              className="border-2 border-dashed border-indigo-900 rounded flex items-center justify-center w-full h-full"
-              onDrop={handleDrop}
-              onDragOver={enableDragAndDropbg}
-            >
-              {changeDivOnImageChange ? (
-                <div
-                  className=" cursor-pointer flex flex-col justify-center items-center bg-rpGray-909 w-[98%] 2xl:h-[97.2%] 2xl:w-[98%] m-3 rounded-md p-4"
-                  id="dropAreaBig"
-                >
-                  <input
-                    accept="image/png,.png,image/jpeg,.jpeg,image/webp,.webp/,.glb,.3ds"
-                    multiple=""
-                    type="file"
-                    tabIndex="-1"
-                    id="file_bigger"
-                    name="file_bigger"
-                    onChange={startListenerChooseImage}
-                  />
+            {showChoosedImage && (
+              <div className="ml-2 p-2 w-[65vw] border-0 h-full bg-gray-900 rounded flex items-center justify-center relative">
+                {/* showing generated image start pop model */}
+                <div className="absolute z-20 flex items-center justify-center align-middle p-10 max-w-full h-full">
                   <img
-                    crossOrigin="anonymous"
-                    src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgZmlsbD0ibm9uZSIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIyMCIgZmlsbD0iI2U3ZWRmYiIvPjxwYXRoIGQ9Ik0zMC43OTMgMTcuMTI0Yy0uNDE5LTIuNTAyLTIuNTc1LTQuMzc1LTUuMTgtNC4zNzUtLjQ2IDAtLjkxMi4wNTktMS4zNS4xNzVhNi41MSA2LjUxIDAgMCAwLTUuMjI0LTIuNTkxYy0zLjYyNSAwLTYuNTc0IDIuOTQ5LTYuNTc0IDYuNTc0bC4wMTcuNDZhNi4xNCA2LjE0IDAgMCAwLTMuODE1IDUuNjc1YzAgMy4zODMgMi43NTIgNi4xMzYgNi4xMzYgNi4xMzYuNDg0IDAgLjg3Ny0uMzkyLjg3Ny0uODc2cy0uMzkyLS44NzYtLjg3Ni0uODc2YTQuMzkgNC4zOSAwIDAgMS00LjM4My00LjM4MyA0LjM4IDQuMzggMCAwIDEgMy4yNS00LjIyOGMuNDQzLS4xMTguNzItLjU1OC42MzUtMS4wMDlhNC44NyA0Ljg3IDAgMCAxLS4wODctLjg5OCA0LjgzIDQuODMgMCAwIDEgNC44MjEtNC44MjFjMS42OTggMCAzLjI0Ljg3MyA0LjEyNCAyLjMzNS4yMjUuMzcyLjY4OS41MjMgMS4wOS4zNTRhMy40OCAzLjQ4IDAgMCAxIDEuMzU5LS4yNzQgMy40OSAzLjQ5IDAgMCAxIDMuNDk5IDMuMzc4Yy4wMTUuNDIxLjMyOC43NzIuNzQ1LjgzNSAyLjEyMy4zMiAzLjcyNCAyLjE4IDMuNzI0IDQuMzI3YTQuMzkgNC4zOSAwIDAgMS00LjM4MiA0LjM4M2MtLjQ4NCAwLS44NzYuMzkyLS44NzYuODc3cy4zOTIuODc3Ljg3Ny44NzdjMy4zODMgMCA2LjEzNi0yLjc1MyA2LjEzNi02LjEzNiAwLTIuNzc0LTEuOTA5LTUuMjA3LTQuNTQtNS45MTh6bS0yLjM4OSA3LjIxMmwtNS43ODUtNS43ODVjLS4zNDItLjM0Mi0uODk3LS4zNDItMS4yMzkgMGwtNS43ODUgNS43ODVjLS4zNDIuMzQyLS4zNDIuODk3IDAgMS4yMzlzLjg5Ny4zNDIgMS4yMzkgMGw0LjI4OC00LjI4OHYxMC44NzVjMCAuNDg0LjM5Mi44NzcuODc3Ljg3N3MuODc3LS4zOTIuODc3LS44NzZWMjEuMjg3bDQuMjg4IDQuMjg4Yy4xNzEuMTcxLjM5Ni4yNTcuNjIuMjU3cy40NDktLjA4Ni42Mi0uMjU3YS44OC44OCAwIDAgMCAwLTEuMjR6IiBmaWxsPSIjMTk3N2YyIi8+PC9zdmc+"
-                    className=""
+                    src={selectedImageIndex}
                     alt=""
-                    id="uploadIcon"
-                  />
-                  <p className="antialiased font-inter-medium font-sans text-[0.875rem] leading-[1.5rem] text-our-blue2 text-center">
-                    <label
-                      htmlFor="file_bigger poppins-light"
-                      id="filebg_label"
-                    >
-                      Drag and Drop or Choose Your File
-                    </label>
-                  </p>
-                  <div className="mt-2.5 flex flex-row justify-center items-center w-full">
-                    <h6
-                      className="!font-inter-regular antialiased font-inter-regular font-sans text-[0.75rem] tracking-wide leading-[1.25rem] text-gray-400 text-center poppins-light"
-                      id="imageType"
-                    >
-                      PNG, JPEG, JPG Max File Size: 10 MB
-                    </h6>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className=" cursor-pointer flex flex-col justify-center items-center w-[96%] m-1 rounded-md p-1"
-                  id="dropAreaBig_"
-                >
-                  <img
-                    src=""
-                    className=" w-full h-full object-contain"
-                    alt=""
-                    id="handleChnageImageData"
+                    className="rounded max-w-full mr-2 max-h-full" // TODO margin had to be set later also fix delete image data
                   />
                 </div>
-              )}
-            </div> */}
+                {/* showing generated image end */}
 
-            {showImageGenerationAndTools && (
-              <div className="ml-2 p-2 w-[65vw] border-0 h-full bg-gray-900 rounded">
-                <div className="border-2 border-dashed border-indigo-900 rounded flex items-center justify-center w-full h-full">
-                  <div
-                    className=" cursor-pointer flex flex-col justify-center items-center bg-rpGray-909 w-[98%] 2xl:h-[97.2%] 2xl:w-[98%] m-3 rounded-md p-4"
-                    id="dropAreaBig"
-                  >
-                    <input
-                      accept="image/png,.png,image/jpeg,.jpeg,image/webp,.webp/,.glb,.3ds"
-                      multiple=""
-                      type="file"
-                      id="file_bigger"
-                      name="file_bigger"
-                    />
-                    <img
-                      src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgZmlsbD0ibm9uZSIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIyMCIgZmlsbD0iI2U3ZWRmYiIvPjxwYXRoIGQ9Ik0zMC43OTMgMTcuMTI0Yy0uNDE5LTIuNTAyLTIuNTc1LTQuMzc1LTUuMTgtNC4zNzUtLjQ2IDAtLjkxMi4wNTktMS4zNS4xNzVhNi41MSA2LjUxIDAgMCAwLTUuMjI0LTIuNTkxYy0zLjYyNSAwLTYuNTc0IDIuOTQ5LTYuNTc0IDYuNTc0bC4wMTcuNDZhNi4xNCA2LjE0IDAgMCAwLTMuODE1IDUuNjc1YzAgMy4zODMgMi43NTIgNi4xMzYgNi4xMzYgNi4xMzYuNDg0IDAgLjg3Ny0uMzkyLjg3Ny0uODc2cy0uMzkyLS44NzYtLjg3Ni0uODc2YTQuMzkgNC4zOSAwIDAgMS00LjM4My00LjM4MyA0LjM4IDQuMzggMCAwIDEgMy4yNS00LjIyOGMuNDQzLS4xMTguNzItLjU1OC42MzUtMS4wMDlhNC44NyA0Ljg3IDAgMCAxLS4wODctLjg5OCA0LjgzIDQuODMgMCAwIDEgNC44MjEtNC44MjFjMS42OTggMCAzLjI0Ljg3MyA0LjEyNCAyLjMzNS4yMjUuMzcyLjY4OS41MjMgMS4wOS4zNTRhMy40OCAzLjQ4IDAgMCAxIDEuMzU5LS4yNzQgMy40OSAzLjQ5IDAgMCAxIDMuNDk5IDMuMzc4Yy4wMTUuNDIxLjMyOC43NzIuNzQ1LjgzNSAyLjEyMy4zMiAzLjcyNCAyLjE4IDMuNzI0IDQuMzI3YTQuMzkgNC4zOSAwIDAgMS00LjM4MiA0LjM4M2MtLjQ4NCAwLS44NzYuMzkyLS44NzYuODc3cy4zOTIuODc3Ljg3Ny44NzdjMy4zODMgMCA2LjEzNi0yLjc1MyA2LjEzNi02LjEzNiAwLTIuNzc0LTEuOTA5LTUuMjA3LTQuNTQtNS45MTh6bS0yLjM4OSA3LjIxMmwtNS43ODUtNS43ODVjLS4zNDItLjM0Mi0uODk3LS4zNDItMS4yMzkgMGwtNS43ODUgNS43ODVjLS4zNDIuMzQyLS4zNDIuODk3IDAgMS4yMzlzLjg5Ny4zNDIgMS4yMzkgMGw0LjI4OC00LjI4OHYxMC44NzVjMCAuNDg0LjM5Mi44NzcuODc3Ljg3N3MuODc3LS4zOTIuODc3LS44NzZWMjEuMjg3bDQuMjg4IDQuMjg4Yy4xNzEuMTcxLjM5Ni4yNTcuNjIuMjU3cy40NDktLjA4Ni42Mi0uMjU3YS44OC44OCAwIDAgMCAwLTEuMjR6IiBmaWxsPSIjMTk3N2YyIi8+PC9zdmc+"
-                      className=""
-                      alt=""
-                      id="uploadIcon"
-                    />
-                    <p className="antialiased font-inter-medium font-sans text-[0.875rem] leading-[1.5rem] text-purple-800 text-center">
-                      <label id="filebg_label">
-                        Drag and Drop or Choose Your File
-                      </label>
-                    </p>
-                    <div className="mt-2.5 flex flex-row justify-center items-center w-full">
-                      <h6
-                        className="!font-inter-regular antialiased font-inter-regular font-sans text-xs tracking-wide leading-[1.25rem] text-gray-500 text-center poppins-light"
-                        id="imageType"
-                      >
-                        PNG, JPEG, JPG Max File Size: 10 MB
-                      </h6>
+                {/* before choosing image start */}
+                {showImageGenerationAndTools && !imageChosen ? (
+                  <div className="border-2 border-dashed border-indigo-900 rounded flex items-center justify-center w-full h-full">
+                    <div
+                      className="cursor-pointer flex flex-col justify-center items-center bg-rpGray-909 w-[98%] h-full m-3 rounded-md p-4"
+                      id="dropAreaBig"
+                      onClick={() =>
+                        document.getElementById("file_bigger").click()
+                      }
+                    >
+                      <input
+                        accept="image/png,.png,image/jpeg,.jpeg,image/webp,.webp/,.glb,.3ds"
+                        multiple=""
+                        type="file"
+                        id="file_bigger"
+                        name="file_bigger"
+                        style={{ display: "none" }}
+                        alt=""
+                      />
+                      <img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgZmlsbD0ibm9uZSIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48Y2lyY2xlIGN4PSIyMiIgY3k9IjIyIiByPSIyMCIgZmlsbD0iI2U3ZWRmYiIvPjxwYXRoIGQ9Ik0zMC43OTMgMTcuMTI0Yy0uNDE5LTIuNTAyLTIuNTc1LTQuMzc1LTUuMTgtNC4zNzUtLjQ2IDAtLjkxMi4wNTktMS4zNS4xNzVhNi41MSA2LjUxIDAgMCAwLTUuMjI0LTIuNTkxYy0zLjYyNSAwLTYuNTc0IDIuOTQ5LTYuNTc0IDYuNTc0bC4wMTcuNDZhNi4xNCA2LjE0IDAgMCAwLTMuODE1IDUuNjc1YzAgMy4zODMgMi43NTIgNi4xMzYgNi4xMzYgNi4xMzYuNDg0IDAgLjg3Ny0uMzkyLjg3Ny0uODc2cy0uMzkyLS44NzYtLjg3Ni0uODc2YTQuMzkgNC4zOSAwIDAgMS00LjM4My00LjM4MyA0LjM4IDQuMzggMCAwIDEgMy4yNS00LjIyOGMuNDQzLS4xMTguNzItLjU1OC42MzUtMS4wMDlhNC44NyA0Ljg3IDAgMCAxLS4wODctLjg5OCA0LjgzIDQuODMgMCAwIDEgNC44MjEtNC44MjFjMS42OTggMCAzLjI0Ljg3MyA0LjEyNCAyLjMzNS4yMjUuMzcyLjY4OS41MjMgMS4wOS4zNTRhMy40OCAzLjQ4IDAgMCAxIDEuMzU5LS4yNzQgMy40OSAzLjQ5IDAgMCAxIDMuNDk5IDMuMzc4Yy4wMTUuNDIxLjMyOC43NzIuNzQ1LjgzNSAyLjEyMy4zMiAzLjcyNCAyLjE4IDMuNzI0IDQuMzI3YTQuMzkgNC4zOSAwIDAgMS00LjM4MiA0LjM4M2MtLjQ4NCAwLS44NzYuMzkyLS44NzYuODc3cy4zOTIuODc3Ljg3Ny44NzdjMy4zODMgMCA2LjEzNi0yLjc1MyA2LjEzNi02LjEzNiAwLTIuNzc0LTEuOTA5LTUuMjA3LTQuNTQtNS45MTh6bS0yLjM4OSA3LjIxMmwtNS43ODUtNS43ODVjLS4zNDItLjM0Mi0uODk3LS4zNDItMS4yMzkgMGwtNS43ODUgNS43ODVjLS4zNDIuMzQyLS4zNDIuODk3IDAgMS4yMzlzLjg5Ny4zNDIgMS4yMzkgMGw0LjI4OC00LjI4OHYxMC44NzVjMCAuNDg0LjM5Mi44NzcuODc3Ljg3N3MuODc3LS4zOTIuODc3LS44NzZWMjEuMjg3bDQuMjg4IDQuMjg4Yy4xNzEuMTcxLjM5Ni4yNTcuNjIuMjU3cy40NDktLjA4Ni42Mi0uMjU3YS44OC44OCAwIDAgMCAwLTEuMjR6IiBmaWxsPSIjMTk3N2YyIi8+PC9zdmc+"
+                        className=""
+                        alt=""
+                        id="uploadIcon"
+                      />
+                      <p className="antialiased font-inter-medium font-sans text-[0.875rem] leading-[1.5rem] text-purple-800 text-center">
+                        <label id="filebg_label">
+                          Drag and Drop or Choose Your File
+                        </label>
+                      </p>
+                      <div className="mt-2.5 flex flex-row justify-center items-center w-full">
+                        <h6
+                          className="!font-inter-regular antialiased font-inter-regular font-sans text-xs tracking-wide leading-[1.25rem] text-gray-500 text-center poppins-light"
+                          id="imageType"
+                        >
+                          PNG, JPEG, JPG Max File Size: 10 MB
+                        </h6>
+                      </div>
                     </div>
                   </div>
-                </div>
-                {/* image view  end */}
+                ) : (
+                  <div
+                    className="border-2 border-dashed border-indigo-900 rounded flex items-center justify-center w-full h-full"
+                    id="imageChoosed"
+                  >
+                    <img
+                      src={imageSrc}
+                      alt=""
+                      className="max-w-full max-h-full p-2 rounded blurChoosed"
+                      style={{
+                        filter: `blur(calc(${ImagesChange / 30}px) `,
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             )}
             {/* home screen main view end  */}
 
             {/* side bar start*/}
-            {showImageGenerationAndTools && (
+            {showSettings && (
               <div className="w-[30vw] px-3 h-full bg-gray-900 rounded">
                 <div className="w-full h-[83vh] overflow-scroll no-scrollbar">
                   <div className="w-full border-0 flex flex-col items-center justify-between rounded">
+                    {/* all button of image view delete , download , share ,replicate , information of images */}
+                    <div className="w-full bg-gray-950 h-fit rounded flex items-center justify-around m-3 mb-0 p-3">
+                      {/* reset choosed imaged */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        onClick={resetChoosedImageData}
+                        className="w-[25px] h-[25px] hover:border-2 p-1 rounded border-purple-600 cursor-pointer"
+                        viewBox="0 0 448 512"
+                      >
+                        <path
+                          fill="#6a1599"
+                          d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"
+                        />
+                      </svg>
+
+                      {/* remove image from view port */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-[25px] h-[25px] hover:border-2 p-1 rounded border-purple-600 cursor-pointer"
+                        viewBox="0 0 448 512"
+                        onClick={removeImageVIewPort}
+                      >
+                        <path
+                          fill="#6a1599"
+                          d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm88 200H296c13.3 0 24 10.7 24 24s-10.7 24-24 24H152c-13.3 0-24-10.7-24-24s10.7-24 24-24z"
+                        />
+                      </svg>
+
+                      {/* ṣhare image button */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-[25px] h-[25px] hover:border-2 p-1 rounded border-purple-600 cursor-pointer"
+                        viewBox="0 0 448 512"
+                      >
+                        <path
+                          fill="#6a1599"
+                          d="M352 224c53 0 96-43 96-96s-43-96-96-96s-96 43-96 96c0 4 .2 8 .7 11.9l-94.1 47C145.4 170.2 121.9 160 96 160c-53 0-96 43-96 96s43 96 96 96c25.9 0 49.4-10.2 66.6-26.9l94.1 47c-.5 3.9-.7 7.8-.7 11.9c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-25.9 0-49.4 10.2-66.6 26.9l-94.1-47c.5-3.9 .7-7.8 .7-11.9s-.2-8-.7-11.9l94.1-47C302.6 213.8 326.1 224 352 224z"
+                        />
+                      </svg>
+
+                      {/* replicate image data  */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-[25px] h-[25px] hover:border-2 p-1 rounded border-purple-600 cursor-pointer"
+                        viewBox="0 0 640 512"
+                      >
+                        <path
+                          fill="#6a1599"
+                          d="M48.2 66.8c-.1-.8-.2-1.7-.2-2.5c0-.1 0-.1 0-.2c0-8.8 7.2-16 16-16c.9 0 1.9 .1 2.8 .2C74.3 49.5 80 56.1 80 64c0 8.8-7.2 16-16 16c-7.9 0-14.5-5.7-15.8-13.2zM0 64c0 26.9 16.5 49.9 40 59.3V228.7C16.5 238.1 0 261.1 0 288c0 35.3 28.7 64 64 64c26.9 0 49.9-16.5 59.3-40H324.7c9.5 23.5 32.5 40 59.3 40c35.3 0 64-28.7 64-64c0-26.9-16.5-49.9-40-59.3V123.3c23.5-9.5 40-32.5 40-59.3c0-35.3-28.7-64-64-64c-26.9 0-49.9 16.5-59.3 40H123.3C113.9 16.5 90.9 0 64 0C28.7 0 0 28.7 0 64zm368 0a16 16 0 1 1 32 0 16 16 0 1 1 -32 0zM324.7 88c6.5 16 19.3 28.9 35.3 35.3V228.7c-16 6.5-28.9 19.3-35.3 35.3H123.3c-6.5-16-19.3-28.9-35.3-35.3V123.3c16-6.5 28.9-19.3 35.3-35.3H324.7zM384 272a16 16 0 1 1 0 32 16 16 0 1 1 0-32zM80 288c0 7.9-5.7 14.5-13.2 15.8c-.8 .1-1.7 .2-2.5 .2l-.2 0c-8.8 0-16-7.2-16-16c0-.9 .1-1.9 .2-2.8C49.5 277.7 56.1 272 64 272c8.8 0 16 7.2 16 16zm391.3-40h45.4c6.5 16 19.3 28.9 35.3 35.3V388.7c-16 6.5-28.9 19.3-35.3 35.3H315.3c-6.5-16-19.3-28.9-35.3-35.3V352H232v36.7c-23.5 9.5-40 32.5-40 59.3c0 35.3 28.7 64 64 64c26.9 0 49.9-16.5 59.3-40H516.7c9.5 23.5 32.5 40 59.3 40c35.3 0 64-28.7 64-64c0-26.9-16.5-49.9-40-59.3V283.3c23.5-9.5 40-32.5 40-59.3c0-35.3-28.7-64-64-64c-26.9 0-49.9 16.5-59.3 40H448v16.4c9.8 8.8 17.8 19.5 23.3 31.6zm88.9-26.7a16 16 0 1 1 31.5 5.5 16 16 0 1 1 -31.5-5.5zM271.8 450.7a16 16 0 1 1 -31.5-5.5 16 16 0 1 1 31.5 5.5zm301.5 13c-7.5-1.3-13.2-7.9-13.2-15.8c0-8.8 7.2-16 16-16c7.9 0 14.5 5.7 15.8 13.2l0 .1c.1 .9 .2 1.8 .2 2.7c0 8.8-7.2 16-16 16c-.9 0-1.9-.1-2.8-.2z"
+                        />
+                      </svg>
+
+                      {/* Show image informations */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-[25px] h-[25px] hover:border-2 p-1 rounded border-purple-600 cursor-pointer"
+                        viewBox="0 0 192 512"
+                      >
+                        <path
+                          fill="#6a1599"
+                          d="M48 80a48 48 0 1 1 96 0A48 48 0 1 1 48 80zM0 224c0-17.7 14.3-32 32-32H96c17.7 0 32 14.3 32 32V448h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H64V256H32c-17.7 0-32-14.3-32-32z"
+                        />
+                      </svg>
+
+                      {/* download image */}
+                      <svg
+                        onClick={() => downloadImage(imageData)}
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="w-[25px] h-[25px] hover:border-2 p-1 rounded border-purple-600 cursor-pointer"
+                        viewBox="0 0 384 512"
+                      >
+                        <path
+                          fill="#6a1599"
+                          d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"
+                        />
+                      </svg>
+                    </div>
+                    {/* all button of image view delte , download , share ,replicate , information of images */}
+
                     {/* prompt start */}
                     <div className="w-full bg-gray-950 h-fit rounded m-3 p-3">
                       {/* button work */}
@@ -661,128 +852,87 @@ const ThreeDModelImage = () => {
                             <p className=" m-4 ml-1 w-[25vw] text-gray-300 tracking-normal text-[.9rem]">
                               Prompt Weight
                             </p>
-                            <div className=" flex justify-center items-center">
-                              <input
-                                id="PromptCount"
-                                type="number"
-                                className="rounded mt-2 w-[5vw] h-[3.5vh] focus:outline-none bg-gray-900 text-gray-200 px-3 text-center text-lg mb-2 p-1"
-                                min="0"
-                                max="10"
-                                value={promptWeight}
-                                onChange={(e) => handleInputChange("prompt", e)}
-                              />
-                              <button
-                                className=" border-2 transition duration-150 ease-in-out rounded border-gray-900 text-gray-900 bg-gray-900 px-2 ml-1 py-[3.5%] text-xs"
-                                onClick={() => handleReset("Prompt")}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  height="17px"
-                                  className=""
-                                  viewBox="0 0 512 512"
-                                  fill="#828487"
-                                >
-                                  <path d="M205 34.8c11.5 5.1 19 16.6 19 29.2v64H336c97.2 0 176 78.8 176 176c0 113.3-81.5 163.9-100.2 174.1c-2.5 1.4-5.3 1.9-8.1 1.9c-10.9 0-19.7-8.9-19.7-19.7c0-7.5 4.3-14.4 9.8-19.5c9.4-8.8 22.2-26.4 22.2-56.7c0-53-43-96-96-96H224v64c0 12.6-7.4 24.1-19 29.2s-25 3-34.4-5.4l-160-144C3.9 225.7 0 217.1 0 208s3.9-17.7 10.6-23.8l160-144c9.4-8.5 22.9-10.6 34.4-5.4z"></path>
-                                </svg>
-                              </button>
-                            </div>
+                            <input
+                              type="range"
+                              name=""
+                              id="Prompt"
+                              className="py-0.5 h-[2px] mr-4 m-2 bg-transparent border-0 text-white w-[80%]"
+                              min="1"
+                              max="50"
+                              value={promptWeight}
+                              onChange={(e) => handleRangeChange("prompt", e)}
+                            />
+                            <p className="text-gray-300 border w-[3.5rem] text-center border-gray-600 rounded ">
+                              {promptWeight}
+                            </p>
                           </div>
-                          <input
-                            type="range"
-                            name=""
-                            id="Prompt"
-                            className="py-0.5 mr-4 m-2 bg-transparent border-0 text-white w-[97%]"
-                            min="0"
-                            max="10"
-                            value={promptWeight}
-                            onChange={(e) => handleRangeChange("prompt", e)}
-                          />
 
                           {/* control start */}
-                          <div className="mb-1 mt-2 flex h-6 w-full justify-between items-center">
+                          <div className="mb-1 my-3 flex h-6 w-full justify-between items-center">
                             <p className=" m-4 ml-1 w-[25vw] text-gray-300 tracking-normal text-[.9rem]">
                               Control Weight
                             </p>
-                            <div className="px-1 flex justify-between items-center">
-                              <input
-                                id="ControlWeight"
-                                className="rounded outline-none mt-2 w-[5vw] h-[3.5vh] bg-gray-900 text-gray-200 px-3 text-center text-lg mb-2 p-1"
-                                type="number"
-                                onChange={(e) =>
-                                  handleInputChange("control", e)
-                                }
-                                value={ControlWeight}
-                              />
-                              <button
-                                className=" border-2 transition duration-150 ease-in-out hover:text-gray-900 rounded border-gray-900 text-gray-900 bg-gray-900 px-2 ml-1 py-[3.5%] text-xs"
-                                onClick={() => handleReset("Control")}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  height="17px"
-                                  className=""
-                                  viewBox="0 0 512 512"
-                                  fill="#828487"
-                                >
-                                  <path d="M205 34.8c11.5 5.1 19 16.6 19 29.2v64H336c97.2 0 176 78.8 176 176c0 113.3-81.5 163.9-100.2 174.1c-2.5 1.4-5.3 1.9-8.1 1.9c-10.9 0-19.7-8.9-19.7-19.7c0-7.5 4.3-14.4 9.8-19.5c9.4-8.8 22.2-26.4 22.2-56.7c0-53-43-96-96-96H224v64c0 12.6-7.4 24.1-19 29.2s-25 3-34.4-5.4l-160-144C3.9 225.7 0 217.1 0 208s3.9-17.7 10.6-23.8l160-144c9.4-8.5 22.9-10.6 34.4-5.4z"></path>
-                                </svg>
-                              </button>
-                            </div>
+
+                            <input
+                              type="range"
+                              name=""
+                              id="ControlWeight_"
+                              className="py-0.5 h-[2px] mr-4 m-2 bg-transparent border-0 text-white w-[80%]"
+                              step="0.1"
+                              min="0"
+                              max="1"
+                              value={ControlWeight}
+                              onChange={(e) => handleRangeChange("control", e)}
+                            />
+                            <p className="text-gray-300 border w-[3.5rem] text-center border-gray-600 rounded ">
+                              {ControlWeight}
+                            </p>
                           </div>
-                          <input
-                            type="range"
-                            name=""
-                            id="ControlWeight_"
-                            className="py-0.5 mr-4 m-2 bg-transparent border-0 text-white w-[97%]"
-                            min="0"
-                            max="10"
-                            value={ControlWeight}
-                            onChange={(e) => handleRangeChange("control", e)}
-                          />
 
                           {/* no of image start */}
-                          <div className="mb-1 mt-2 flex h-6 w-full justify-between items-center">
+                          <div className="mb-1 my-3 flex h-6 w-full justify-between items-center">
                             <p className=" m-4 ml-1 w-[25vw] text-gray-300 tracking-normal text-[.9rem]">
                               Numbers of Images
                             </p>
-                            <div className="px-1 flex justify-between items-center">
-                              <input
-                                id="ControlWeight"
-                                className="rounded outline-none mt-2 w-[5vw] h-[3.5vh] bg-gray-900 text-gray-200 px-3 text-center text-lg mb-2 p-1"
-                                type="number"
-                                max={1}
-                                min={1}
-                                value={ImagesNosCount}
-                                onChange={(e) =>
-                                  handleRangeChange("ImagesNos", e)
-                                }
-                              />
-                              <button
-                                className=" border-2 transition duration-150 ease-in-out hover:text-gray-900 rounded border-gray-900 text-gray-900 bg-gray-900 px-2 ml-1 py-[3.5%] text-xs"
-                                onClick={() => handleReset("ImagesNos")}
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  height="17px"
-                                  className=""
-                                  viewBox="0 0 512 512"
-                                  fill="#828487"
-                                >
-                                  <path d="M205 34.8c11.5 5.1 19 16.6 19 29.2v64H336c97.2 0 176 78.8 176 176c0 113.3-81.5 163.9-100.2 174.1c-2.5 1.4-5.3 1.9-8.1 1.9c-10.9 0-19.7-8.9-19.7-19.7c0-7.5 4.3-14.4 9.8-19.5c9.4-8.8 22.2-26.4 22.2-56.7c0-53-43-96-96-96H224v64c0 12.6-7.4 24.1-19 29.2s-25 3-34.4-5.4l-160-144C3.9 225.7 0 217.1 0 208s3.9-17.7 10.6-23.8l160-144c9.4-8.5 22.9-10.6 34.4-5.4z"></path>
-                                </svg>
-                              </button>
-                            </div>
+                            <input
+                              type="range"
+                              name=""
+                              id="ImagesNos_"
+                              className="py-0.5 h-[2px] mr-4 m-2 bg-transparent border-0 text-white w-[80%]"
+                              min="0"
+                              max="2"
+                              value={ImagesNosCount}
+                              onChange={(e) =>
+                                handleRangeChange("ImagesNos", e)
+                              }
+                            />
+                            <p className="text-gray-300 border w-[3.5rem] text-center border-gray-600 rounded ">
+                              {ImagesNosCount}
+                            </p>
                           </div>
-                          <input
-                            type="range"
-                            name=""
-                            id="ImagesNos_"
-                            className="py-0.5 mr-4 m-2 bg-transparent border-0 text-white w-[97%]"
-                            min="0"
-                            max="1"
-                            value={ImagesNosCount}
-                            onChange={(e) => handleRangeChange("ImagesNos", e)}
-                          />
+
+                          {/* image changes from original */}
+                          <div className="mb-1 my-3 flex h-6 w-full justify-between items-center">
+                            <p className=" m-4 ml-1 w-[25vw] text-gray-300 tracking-normal text-[.9rem]">
+                              Similarity
+                            </p>
+                            <input
+                              type="range"
+                              name=""
+                              id="ImagesChange"
+                              className="py-0.5 h-[2px] mr-4 m-2 bg-transparent border-0 text-white w-[80%]"
+                              min="0"
+                              max="100"
+                              value={ImagesChange}
+                              onChange={(e) =>
+                                handleRangeChange("ImagesChange", e)
+                              }
+                            />
+                            <p className="text-gray-300 border w-[3.5rem] text-center border-gray-600 rounded ">
+                              {ImagesChange}
+                            </p>
+                          </div>
+
                           {/* settings options end */}
 
                           {/* seed start */}
@@ -796,6 +946,7 @@ const ThreeDModelImage = () => {
                               className="w-[25%] 2xl:w-[5vw] pl-1 bg-transparent ml-[20%] 2xl:ml-[43%] 2xl:mr-4 h-8 border-2 border-gray-800 text-white border-b-2 md:mb-2 border-gray-910 border-t-0 border-l-0 border-r-0 outline-none"
                               placeholder="Default -1"
                               id="resetButton"
+                              value={seed}
                             />
                             <button
                               className=" font-semibold border-2 transition duration-150 ease-in-out hover:text-gray-900 rounded border-gray-900 text-gray-900 bg-gray-900 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 2xl:mr-2"
@@ -870,15 +1021,43 @@ const ThreeDModelImage = () => {
                       </div>
 
                       {/* images */}
-                      {isGeneratedVisible && image && (
-                        <div className="grid grid-cols-2 gap-3 rounded p-2">
+                      {/* loader and image generations */}
+
+                      {isGeneratedVisible && (
+                        <>
+                          {isGenerating === true ? (
+                            <div className="flex items-center justify-center my-20">
+                              <div className="loader"></div>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-3 rounded p-2">
+                              {image.map((imag, i) => (
+                                <img
+                                  key={i}
+                                  src={imag}
+                                  alt=""
+                                  className="w-[200px] h-[200px] border rounded "
+                                  onClick={() => showImage(imag)}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {/* <div className="grid grid-cols-2 gap-3 rounded p-2">
+                        {image.map((imag, i) => (
                           <img
-                            src={image}
+                            key={i}
+                            src={imag}
                             alt=""
                             className="w-[200px] h-[200px] border rounded "
+                            onClick={() => {
+                              showImage(imag), (imageData = imag);
+                            }}
                           />
-                        </div>
-                      )}
+                        ))}
+                      </div> */}
                     </div>
                     {/* generated image view end */}
                   </div>
@@ -915,56 +1094,7 @@ const ThreeDModelImage = () => {
             {/* side bar end*/}
 
             {/* project part start */}
-            {showProject && (
-              <div className="p-2 w-[96vw] border-0 h-full bg-gray-900 rounded">
-                <div className="border-2 border-dashed border-indigo-900 rounded flex flex-col p-10 pt-5 text-gray-400 items-center justify-center w-full h-full">
-                  {/* navbar */}
-                  <div className="h-[8vh] w-full border-0 flex items-center justify-between ">
-                    <div className="flex items-center justify-around p-1 bg-gray-950">
-                      <button
-                        onClick={() => handleTabClick("project")}
-                        className={`mr-2 p-1 px-3 rounded tracking-wide ${
-                          activeTab === "project" ? "text-purple-800" : ""
-                        }`}
-                      >
-                        Creation
-                      </button>
-                      <button
-                        onClick={() => handleTabClick("favorite")}
-                        className={`mr-2 p-1 px-3 rounded tracking-wide ${
-                          activeTab === "favorite" ? "text-purple-800" : ""
-                        }`}
-                      >
-                        Favrouite
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      className=" w-[17vw] h-[4vh] px-1 placeholder-slate-700 bg-transparent outline-none border border-gray-600 rounded "
-                      placeholder="Search images"
-                    />
-                  </div>
-                  {/* content */}
-                  {activeTab === "project" ? (
-                    <div className="w-full h-[90vh] border-t border-gray-700 grid xl:grid-cols-5 gap-3 p-10 overflow-scroll no-scrollbar ">
-                      {imageArray.map((e, i) => (
-                        <div key={i} className=" h-[300px] border p-2 rounded-xl border-gray-800">
-                          <img
-                            src={e}
-                            alt=""
-                            className=" rounded-xl w-full h-full"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="w-full h-[90vh] border-t border-gray-700 ">
-                      fav
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            {showProject && <ProfileDashboard />}
             {/* project part end */}
           </div>
         </div>
@@ -973,4 +1103,4 @@ const ThreeDModelImage = () => {
   );
 };
 
-export default ThreeDModelImage;
+export default ImageGeneration;

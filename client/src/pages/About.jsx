@@ -597,7 +597,7 @@ const About = () => {
 
             <div className="w-full px-4 lg:w-1/2 xl:w-5/12">
               <div className="mt-10 lg:mt-0">
-                <span className="block mb-4 text-indigo-600 font-bold tracking-wide text-lg underline underline-offset-8 text-primary">
+                <span className="block mb-4 WhyChooseUs font-bold tracking-wide text-lg underline underline-offset-8 text-primary">
                   Why Choose Us
                 </span>
                 <h2 className="mb-5 text-3xl font-bold text-indigo-400 sm:text-[40px]/[48px]">

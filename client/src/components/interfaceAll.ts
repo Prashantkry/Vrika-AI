@@ -1,0 +1,18 @@
+export interface ProfileData {
+    readonly UserId: string,
+    UserName: string,
+    email: string,
+    PhoneNo: Number,
+    Address: string,
+    ProfileImage: string,
+    readonly ProductName: string,
+    readonly ProductActive: boolean,
+    readonly ProductPurchaseDate: string,
+    readonly ProductExpiryDate: string,
+    readonly ProductPrice: Number,
+    readonly token: Number,
+    readonly CardHolderName: string,
+    readonly Card: Number,
+    readonly CardE: string,
+    readonly CardType: string,
+}

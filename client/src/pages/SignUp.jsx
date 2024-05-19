@@ -4,7 +4,7 @@ import "../App.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const APIUrl = "http://localhost:8000/api/v1";
+const APIUrl = "http://localhost:5000/api/v1";
 
 export default function SignUpPage() {
   // image work start
@@ -25,14 +25,12 @@ export default function SignUpPage() {
     });
   };
 
-  const imageDataChange = async (e) => {
+  const imageDataChange = async (e) => {   // when base 64
     const file = e.target.files[0];
     const convertToBase64Res = await convertToBase64(file);
     setImageData({ ...imageData, myFile: convertToBase64Res });
     setSelectedImage(imageData);
   };
-
-  const image = imageData.myFile;
   // image work end
 
   const sendSignUpData = async () => {
@@ -41,7 +39,7 @@ export default function SignUpPage() {
     let Phone = document.getElementById("number").value;
     let Password = document.getElementById("pass").value;
 
-    console.log(Name, Email, Phone, Password, imageData);
+    // console.log(Name, Email, Phone, Password, imageData);
     const singUpData = await fetch(`${APIUrl}/SignUp`, {
       method: "POST",
       headers: {
@@ -52,16 +50,17 @@ export default function SignUpPage() {
         Email,
         Password,
         Phone,
-        image,
+        image: imageData,
       }),
     });
     const receivedData = await singUpData.json();
     console.log(receivedData);
-    if (receivedData.message === "SignupDataSaved") {
+    if (receivedData.message === "User created successfully") {
       toast.success("Signup successful!");
-      window.location.href = "/";
+      window.location.href = "/signIn";
     } else if (receivedData.message === "UserAlready") {
       toast.error("User already exists. Please sign in");
+      window.location.href = "/signIn";
     } else {
       toast.error("Error: Signup failed!");
     }

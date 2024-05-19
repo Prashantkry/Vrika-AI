@@ -1,0 +1,24 @@
+const express = require("express");
+const versionRoute = express.Router();
+
+const ImageRouter = require("./generateImage");
+versionRoute.use("/generateImage", ImageRouter);
+
+const CreateUserRoutes = require("./CreateUserRoutes");
+const LogInUserRoutes = require("./LogInUserRoutes");
+versionRoute.use("/signUp", CreateUserRoutes);
+versionRoute.use("/signIn", LogInUserRoutes);
+
+const verifyAuthRoute = require("./checkAuth");
+versionRoute.use("/generateImageT3DM", verifyAuthRoute);
+
+const paymentRoute = require("./subscriptionsRoute");
+versionRoute.use("/payment", paymentRoute);
+
+const getProductRouter = require("./ProfileDataRoute");
+versionRoute.use("/getProfileData", getProductRouter);
+
+const GetAllGeneratedImagesRouter = require("./getAllGeneratedImages");
+versionRoute.use("/getAllGeneratedImagesData", GetAllGeneratedImagesRouter);
+
+module.exports = versionRoute;
