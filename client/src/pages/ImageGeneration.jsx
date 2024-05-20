@@ -904,7 +904,7 @@ const ImageGeneration = () => {
                               id="ImagesNos_"
                               className="py-0.5 h-[2px] mr-4 m-2 bg-transparent border-0 text-white w-[80%]"
                               min="0"
-                              max="2"
+                              max="1"
                               value={ImagesNosCount}
                               onChange={(e) =>
                                 handleRangeChange("ImagesNos", e)
