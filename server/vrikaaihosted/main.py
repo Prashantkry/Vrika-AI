@@ -18,21 +18,55 @@ pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config)
 # Move model and computations to GPU for faster processing
 pipe = pipe.to('cuda')
 
+# class Item(BaseModel):
+# 	prompt: str
+# 	num_inference_steps: Optional[int] = 50
+#     width: Optional[int]=2000
+#     height: Optional[int]
+#     seed: Optional[int]
+#     negative_prompt: Optional[str]
+#     num_outputs: Optional[int] 
+#     guidance_scale: Optional[float]
+#     scheduler: Optional[str]
+#     refine_steps: Optional[int]
+#     refine: Optional[str] 
+#     sizing_strategy: Optional[str] 
+#     num_inference_steps: Optional[int] = 1
+
 class Item(BaseModel):
-	prompt: str
-	num_inference_steps: Optional[int] = 50
- 
-def predict(item, run_id, logger):
+    prompt: str
+    num_inference_steps: Optional[int] = 20
+    height: Optional[int] = 512
+    width: Optional[int] = 512
+    guidance_scale: Optional[float] = 7.5
+    negative_prompt: Optional[str] = None
+    num_images_per_prompt: Optional[int] = 1
+    seed: Optional[int] = 1
+
+def predict(item):
     item = Item(**item)
 
-    image = pipe(item.prompt).images[0]
+    generator = torch.manual_seed(item.seed) if item.seed else None
+
+    images = pipe(
+        prompt=item.prompt,
+        num_inference_steps=item.num_inference_steps,
+        width=item.width,
+        height=item.height,
+        negative_prompt=item.negative_prompt,
+        num_images_per_prompt=item.num_images_per_prompt,
+        guidance_scale=item.guidance_scale,
+        generator=generator
+        
+    ).images
+    
+    image_array = []
+    
     buffered = io.BytesIO()
-    image.save(buffered, format='PNG')
-    finished_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
-    return finished_image
-
-def run(param_1: str, param_2: str, run_id):  # run_id is optional, injected by Cerebrium at runtime
-    my_results = {"1": param_1, "2": param_2}
-    my_status_code = 200 # if you want to return a specific status code
-
-    return {"my_result": my_results, "status_code": my_status_code} # return your results
+    for img in images: 
+        
+        img.save(buffered, format='PNG')
+        finished_image = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        image_array.append(finished_image)    
+        
+    return image_array

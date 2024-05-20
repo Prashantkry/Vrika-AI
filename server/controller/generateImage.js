@@ -23,31 +23,34 @@ const ImageGenerate = async (req, res) => {
         "Content-Type": "application/json",
         Authorization: CEREBIUMM_Auth,
       },
-      body: JSON.stringify({
-        width: 1024,
-        height: 1024,
-        seed: seed,
+      body: JSON.stringify({item:{
+        // width: 1024,
+        // height: 1024,
+        // seed: seed,
         prompt: textContent,
-        negative_prompt: nTextContent,
-        refine: "base_image_refiner",
-        scheduler: "KarrasDPM",
-        num_outputs: num_outputs,
-        refine_steps: 20,
-        guidance_scale: guidance_scale,
-        apply_watermark: false,
-        sizing_strategy: "width_height",
-        num_inference_steps: 30,
-        controlnet_1: "none",
-        controlnet_1_start: 0,
-        controlnet_1_end: 1,
-        controlnet_1_conditioning_scale: controlnet_conditioning_scale || 0.8,
-      }),
+        // negative_prompt: nTextContent,
+        // refine: "base_image_refiner",
+        // scheduler: "KarrasDPM",
+        // num_outputs: num_outputs,
+        // refine_steps: 20,
+        // guidance_scale: guidance_scale,
+        // apply_watermark: false,
+        // sizing_strategy: "width_height",
+        // num_inference_steps: 30,
+
+        // // not  in use below 
+        // // controlnet_1: "none",
+        // // controlnet_1_start: 0,
+        // // controlnet_1_end: 1,
+        // // controlnet_1_conditioning_scale: controlnet_conditioning_scale || 0.8,
+      }}),
     });
     const result = await data.json();
     console.log("result => ", result);
+    const generatedImageData = result.result
     res.status(200).json({
       message: "Generated Image",
-      result,
+      generatedImageData
     });
   } catch (error) {
     console.error(error);

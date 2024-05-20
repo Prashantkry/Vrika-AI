@@ -289,52 +289,56 @@ const ImageGeneration = () => {
     });
     const apiRes = await response.json();
     console.log("apiRes => ", apiRes);
-    const imageData = apiRes.imageData.ImageDataGenAi;
-    console.log("imageData => ", imageData);
-    setImage((prevImages) => [...prevImages, ...imageData]);
-    console.log(image);
     setIsGenerating(false);
+    const imageData = apiRes.generatedImageData
+    console.log("imageData => ", imageData);
+    // setImage((prevImages) => [...prevImages, ...imageData]); // when image 
+    setImage((prevImages) => [
+      ...prevImages,
+      ...imageData.map(data => `data:image/png;base64,${data}`)
+    ]);
+    console.log(image);
 
     // for mongo db extractions
     const InfoJson = {
-      input: {
-        controlnet_1: apiRes.imageData.GenAiImageData.input.controlnet_1,
-        controlnet_1_conditioning_scale:
-          apiRes.imageData.GenAiImageData.input.controlnet_1_conditioning_scale,
-        controlnet_1_end:
-          apiRes.imageData.GenAiImageData.input.controlnet_1_end,
-        controlnet_1_start:
-          apiRes.imageData.GenAiImageData.input.controlnet_1_start,
-        controlnet_2: apiRes.imageData.GenAiImageData.input.controlnet_2,
-        controlnet_2_conditioning_scale:
-          apiRes.imageData.GenAiImageData.input.controlnet_2_conditioning_scale,
-        controlnet_2_end:
-          apiRes.imageData.GenAiImageData.input.controlnet_2_end,
-        controlnet_2_start:
-          apiRes.imageData.GenAiImageData.input.controlnet_2_start,
-        guidance_scale: apiRes.imageData.GenAiImageData.input.guidance_scale,
-        height: apiRes.imageData.GenAiImageData.input.height,
-        width: apiRes.imageData.GenAiImageData.input.width,
-        prompt: apiRes.imageData.GenAiImageData.input.prompt,
-        negative_prompt: apiRes.imageData.GenAiImageData.input.negative_prompt,
-        num_inference_steps:
-          apiRes.imageData.GenAiImageData.input.num_inference_steps,
-        num_outputs: apiRes.imageData.GenAiImageData.input.num_outputs,
-        refine: apiRes.imageData.GenAiImageData.input.refine,
-        refine_steps: apiRes.imageData.GenAiImageData.input.refine_steps,
-        scheduler: apiRes.imageData.GenAiImageData.input.scheduler,
-        seed: apiRes.imageData.GenAiImageData.input.seed,
-        sizing_strategy: apiRes.imageData.GenAiImageData.input.sizing_strategy,
-      },
-      created_at: apiRes.imageData.GenAiImageData.created_at,
-      started_at: apiRes.imageData.GenAiImageData.started_at,
-      completed_at: apiRes.imageData.GenAiImageData.completed_at,
-      metrics: {
-        predict_time: apiRes.imageData.GenAiImageData.metrics.predict_time,
-      },
-      images: apiRes.imageData.GenAiImageData.output,
+      // input: {
+      //   controlnet_1: apiRes.imageData.GenAiImageData.input.controlnet_1,
+      //   controlnet_1_conditioning_scale:
+      //     apiRes.imageData.GenAiImageData.input.controlnet_1_conditioning_scale,
+      //   controlnet_1_end:
+      //     apiRes.imageData.GenAiImageData.input.controlnet_1_end,
+      //   controlnet_1_start:
+      //     apiRes.imageData.GenAiImageData.input.controlnet_1_start,
+      //   controlnet_2: apiRes.imageData.GenAiImageData.input.controlnet_2,
+      //   controlnet_2_conditioning_scale:
+      //     apiRes.imageData.GenAiImageData.input.controlnet_2_conditioning_scale,
+      //   controlnet_2_end:
+      //     apiRes.imageData.GenAiImageData.input.controlnet_2_end,
+      //   controlnet_2_start:
+      //     apiRes.imageData.GenAiImageData.input.controlnet_2_start,
+      //   guidance_scale: apiRes.imageData.GenAiImageData.input.guidance_scale,
+      //   height: apiRes.imageData.GenAiImageData.input.height,
+      //   width: apiRes.imageData.GenAiImageData.input.width,
+      //   prompt: apiRes.imageData.GenAiImageData.input.prompt,
+      //   negative_prompt: apiRes.imageData.GenAiImageData.input.negative_prompt,
+      //   num_inference_steps:
+      //     apiRes.imageData.GenAiImageData.input.num_inference_steps,
+      //   num_outputs: apiRes.imageData.GenAiImageData.input.num_outputs,
+      //   refine: apiRes.imageData.GenAiImageData.input.refine,
+      //   refine_steps: apiRes.imageData.GenAiImageData.input.refine_steps,
+      //   scheduler: apiRes.imageData.GenAiImageData.input.scheduler,
+      //   seed: apiRes.imageData.GenAiImageData.input.seed,
+      //   sizing_strategy: apiRes.imageData.GenAiImageData.input.sizing_strategy,
+      // },
+      // created_at: apiRes.imageData.GenAiImageData.created_at,
+      // started_at: apiRes.imageData.GenAiImageData.started_at,
+      // completed_at: apiRes.imageData.GenAiImageData.completed_at,
+      // metrics: {
+      //   predict_time: apiRes.imageData.GenAiImageData.metrics.predict_time,
+      // },
+      // images: apiRes.imageData.GenAiImageData.output,
     };
-    console.log("InfoJson => ", InfoJson);
+    // console.log("InfoJson => ", InfoJson);
   };
   // ! end
 
