@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 // import { ProfileData } from './interfaceAll'
 import { useSelector } from 'react-redux'
+import { useNavigate } from "react-router-dom"
 import w2, {
   down,
   right,
@@ -17,8 +18,10 @@ import w2, {
 
 let imageArray = [w1, w3, w4, w5, w2, a1, a2, a3, a4, a5];
 let imageData
+let customerId
 
 const ProfileDashboard = () => {
+  const navigate = useNavigate()
   // taking userId from store redux 
   const UserID: string = useSelector((state) => state.Login.UserId)
 
@@ -75,6 +78,10 @@ const ProfileDashboard = () => {
 
       const data = await res.json()
       console.log(data)
+
+      customerId = data.customerId
+
+
       // setImagesGenerated(data.allImages.flatMap(item => item.imagesData.flat())) // when images 
       const allImages = data.allImages.flatMap(item =>
         item.imagesData.flat().map(image => ({
@@ -115,6 +122,26 @@ const ProfileDashboard = () => {
   // end
 
 
+  async function redirectToUpgrade() {
+    //   // window.location.href("https://billing.stripe.com/p/login/test_3cs6rlbZn7093PG9AA")
+    console.log("customerId => ", customerId)
+    let response = await fetch('https://vrika-ai.onrender.com/api/v1/getCustomerPortalR', {
+      method: 'POST',
+      body: JSON.stringify({ customerId }),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    console.log("response => ", response)
+    let userStripeData = await response.json();
+    console.log(userStripeData)
+    let url = userStripeData.paymentResponse;
+    console.log("customerPortal API response : ", url);
+    window.open(url, '_blank');
+    // window.location.href(url)
+    // navigate(url)
+  }
+
   return (
     <>
       <div className="border-0 border-indigo-900 rounded flex p-10 pt-5 m- my-6 text-gray-400 items-center justify-center w-[94vw] h-[90vh]">
@@ -129,7 +156,7 @@ const ProfileDashboard = () => {
                   Pro
                 </p>
               </div>
-              <button className='bg-indigo-700 w-[60%] my-3 rounded py-2 '>
+              <button className='bg-indigo-700 w-[60%] my-3 rounded py-2 ' onClick={redirectToUpgrade}>
                 Upgrade Plan
               </button>
             </div>
@@ -149,7 +176,7 @@ const ProfileDashboard = () => {
         <div className='w-[70vw] h-full'>
           {/* navbar */}
           <div className="h-[8vh] w-full border-0 flex items-center justify-between ">
-            <div className="flex items-center justify-around p-1 bg-gray-950">
+            <div className="flex items-center justify-around p-1 bg-gray-950 relative">
               <button
                 className={`mr-2 p-1 px-3 rounded tracking-wide ${activeTab === "project" ? "text-purple-800" : ""
                   }`}
@@ -171,7 +198,7 @@ const ProfileDashboard = () => {
           </div>
           {/* content */}
           <div className="w-full h-[90vh] ">
-            <div className="w-full h-[75vh] border-t border-gray-700 grid xl:grid-cols-3 gap-3 p-10 z-30 overflow-scroll no-scrollbar relative">
+            <div className="w-full h-[75vh] border-t border-gray-700 grid xl:grid-cols-3 gap-3 p-10 z-30 overflow-scroll no-scrollbar">
               {imagesGenerated.map((e, i) => (
                 <div
                   key={i}
@@ -187,7 +214,7 @@ const ProfileDashboard = () => {
               ))}
               {/* big view of images */}
               {viewImage !== null && (
-                <div className='absolute inset-0 flex items-center justify-center m-5 my-1 p-2 rounded bg-gray-950 border-2 border-gray-900' onClick={() => showHideBigImage(viewImage)}>
+                <div className='absolute inset-0 flex items-center justify-center m-5 p-2 w-[90%] h-[90%] mx-auto my-auto rounded bg-gray-950 border-2 border-gray-900' onClick={() => showHideBigImage(viewImage)}>
                   <img src={imagesGenerated[viewImage].url} alt="" className='w-[70%] h-full rounded' id='viewImages' />
                   <div className="w-[29%] h-full">
 

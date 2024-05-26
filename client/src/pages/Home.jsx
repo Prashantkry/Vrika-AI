@@ -2,7 +2,61 @@ import { useNavigate } from "react-router-dom";
 import "../App.css";
 import Features from "../components/Features";
 import UseCases from "../components/UseCases";
+import { useEffect } from "react";
 const Home = () => {
+  const navigate = useNavigate();
+
+  // ! page protection start
+  useEffect(() => {
+    // Disable right-click
+    const disableRightClick = (event) => {
+      if (event.button === 2) {
+        event.preventDefault();
+        // alert("Page is protected!");
+        return false;
+      }
+    };
+    window.addEventListener('contextmenu', disableRightClick);
+
+    // Disable specific key combinations
+    const disableKeys = (event) => {
+      if (
+        (event.ctrlKey && event.shiftKey && event.key === 'I') || // Ctrl+Shift+I
+        (event.ctrlKey && event.shiftKey && event.key === 'C') || // Ctrl+Shift+C
+        (event.ctrlKey && event.shiftKey && event.key === 'J') || // Ctrl+Shift+J
+        (event.key === 'F12') || // F12
+        (event.ctrlKey && event.key === 'S') || // Ctrl+S
+        (event.metaKey && event.key === 'S') || // Command+S (for Mac)
+        (event.ctrlKey && event.key === 's') || // Ctrl+S
+        (event.metaKey && event.key === 's') // Command+S (for Mac)
+      ) {
+        event.preventDefault();
+        // alert("Page is protected can't use Inspect mode disabled!");
+        // alert("Page is protected");
+        return false;
+      }
+    };
+    window.addEventListener('keydown', disableKeys);
+
+    // Check if dev tools are opened
+    const checkDevTools = () => {
+      if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+        document.body.innerHTML = '<h1>Dev Tools are not allowed!</h1>';
+      }
+    };
+    const devToolsCheckInterval = setInterval(checkDevTools, 1000);
+
+    // Clean up event listeners and interval on unmount
+    return () => {
+      window.removeEventListener('contextmenu', disableRightClick);
+      window.removeEventListener('keydown', disableKeys);
+      clearInterval(devToolsCheckInterval);
+    };
+  }, []);
+
+  // ! page protection end 
+
+
   function handleMouseEnter() {
     let showHide = document.getElementById("showHide");
     showHide.style.display = "block";
@@ -14,18 +68,17 @@ const Home = () => {
     }, 500);
   }
 
-  const navigate = useNavigate();
   function handleGetStart() {
     navigate("/Image3DImage");
   }
   return (
     <>
       <main>
-        <div className="relative w-full h-[92vh] bg-slate-950">
+        <div className="relative w-full homeData bg-slate-950">
           <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
           <div className="bg-gradient-to-r from-primary to-secondary-foreground text-transparent bg-clip-text relative flex flex-col items-center justify-center">
             {/* title */}
-            <h1 className="alex-brush-regular animate-text-gradient bg-gradient-to-r from-[#6c5fc9] via-[#8678f9] to-[#695cc9] bg-[200%_auto] pt-20 px-12 border-0 bg-clip-text text-transparent font-bold text-center text-purple-950">
+            <h1 className="alex-brush-regular animate-text-gradient bg-gradient-to-r from-[#6c5fc9] via-[#8678f9] to-[#695cc9] bg-[200%_auto] px-12 h-fit border-0 bg-clip-text text-transparent font-bold text-center text-purple-950">
               <span className="lovers-quarrel-regular title">V</span>
               <span className="arizonia_regular titleS">rika</span>{" "}
               <span className="lovers-quarrel-regular title">A</span>
@@ -77,7 +130,7 @@ const Home = () => {
 
             {/* button */}
             <button
-              className="GetStartedFree text-5xl font-bold text-indigo-500 p-6 w-fit px-10 border-2 border-purple-900 rounded my-12 flex items-center justify-around"
+              className="GetStartedFree text-5xl font-bold text-indigo-500 p-6 w-fit px-10 border-2 border-purple-900 rounded my-12 mb-16 flex items-center justify-around"
               onClick={handleGetStart}
             >
               Get Started for free
@@ -94,7 +147,7 @@ const Home = () => {
           </div>
 
           {/* help button */}
-          <div className="relative border-0 w-[50vw] ">
+          {/* <div className="relative border-0 w-[50vw] helpButton">
             <button
               className="m-28 mt-3 border-0"
               onMouseEnter={handleMouseEnter}
@@ -109,10 +162,10 @@ const Home = () => {
                   fill="#5e0eaf"
                   d="M267.7 471.5l10.6 15.8 5.3-12.3 5.3 7V512c21.1-7.9 21.1-66.9 25.5-97.2 4.6-31.9-.9-92.8 81.4-149.1-8.9-23.6-12-49.4-2.6-80.1C421 189 447 196.2 456.4 239.7l-30.4 8.4c11.2 23 17 46.8 13.2 72.1L412 313.2l-6.2 33.4-18.5-7-8.8 33.4-19.4-7 26.4 21.1 8.8-28.2L419 364.2l7-35.6 26.4 14.5c.3-20 7-58.1-8.8-84.5l26.4 5.3c4-22.1-2.4-39.2-7.9-56.7l22.4 9.7c-.4-25.1-29.9-56.8-61.6-58.5-20.2-1.1-56.7-25.2-54.1-51.9 2-19.9 17.5-42.6 43.1-49.7-44 36.5-9.7 67.3 5.3 73.5 4.4-11.4 17.5-69.1 0-130.2-40.4 22.9-89.7 65.1-93.2 147.8l-58 38.7-3.5 93.3L369.8 220l7 7-17.6 3.5-44 38.7-15.8-5.3-28.1 49.3-3.5 119.6 21.1 15.8-32.6 15.8-32.6-15.8 21.1-15.8-3.5-119.6-28.2-49.3-15.8 5.3-44-38.7-17.6-3.5 7-7 107.3 59.8-3.5-93.3-58.1-38.7C185 65.1 135.8 22.9 95.3 0c-17.5 61.1-4.4 118.8 0 130.2 15-6.2 49.3-37 5.3-73.5 25.7 7.1 41.2 29.8 43.1 49.7 2.6 26.7-33.9 50.8-54.1 51.9-31.7 1.7-61.2 33.4-61.6 58.5l22.4-9.7c-5.5 17.5-11.9 34.7-7.9 56.7l26.4-5.3c-15.8 26.4-9.1 64.4-8.8 84.5l26.4-14.5 7 35.6 24.6-5.3 8.8 28.2L153.4 366 134 373l-8.8-33.4-18.5 7-6.2-33.4-27.3 7c-3.8-25.4 2-49.1 13.2-72.1l-30.4-8.4c9.4-43.5 35.5-50.8 63.3-54.1 9.4 30.6 6.2 56.5-2.6 80.1 82.3 56.3 76.8 117.2 81.4 149.1 4.4 30.4 4.5 89.3 25.5 97.2v-29.8l5.3-7 5.3 12.3 10.6-15.8 11.4 21.1 11.4-21.1zm79.2-95L331.1 366c7.5-4.4 13.8-8.4 19.4-12.3-.6 7.2-.3 13.8-3.5 22.8zm28.2-49.3c-.4 10.9-.9 21.7-1.8 31.7-7.9-1.9-15.6-3.8-21.1-7 8.2-7.9 15.6-16.3 22.9-24.7zm24.6 5.3c0-13.4-2.1-24.2-5.3-33.4a235 235 0 0 1 -18.5 27.3zm3.5-80.9c19.4 12.8 27.8 33.7 29.9 56.3-12.3-4.5-24.6-9.3-37-10.6 5.1-12 6.7-28.1 7-45.7zm-1.8-45.7c.8 14.3 1.8 28.8 1.8 42.2 19.2-8.1 29.8-9.7 44-14.1-10.6-19-27.2-25.5-45.8-28.2zM165.7 376.5L181.5 366c-7.5-4.4-13.8-8.4-19.4-12.3 .6 7.3 .3 13.9 3.5 22.9zm-28.2-49.3c.4 10.9 .9 21.7 1.8 31.7 7.9-1.9 15.6-3.8 21.1-7-8.2-7.9-15.6-16.3-22.9-24.7zm-24.6 5.3c0-13.4 2-24.2 5.3-33.4a235 235 0 0 0 18.5 27.3zm-3.5-80.9c-19.4 12.8-27.8 33.7-29.9 56.3 12.3-4.5 24.6-9.3 37-10.6-5-12-6.7-28.1-7-45.7zm1.8-45.7c-.8 14.3-1.8 28.8-1.8 42.2-19.2-8.1-29.8-9.7-44-14.1 10.6-19 27.2-25.5 45.8-28.2z"
                 />
-              </svg>
+              </svg> */}
 
-              {/* content */}
-              <div
+          {/* content */}
+          {/* <div
                 className="w-[30vw] h-[15vh] absolute border-0 bg-indigo-950 -mt-6 ml-16 rounded hidden"
                 id="showHide"
               >
@@ -126,7 +179,7 @@ const Home = () => {
                 </ul>
               </div>
             </button>
-          </div>
+        </div> */}
         </div>
 
         {/* other components */}

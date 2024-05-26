@@ -82,6 +82,7 @@ const handleWebhook = async (req, res) => {
             "Subscription.expiryDate": expiryDate,
             "Subscription.token": 10,
             "Subscription.amount": amount,
+            "Subscription.customerId":customerId
           },
         };
       }
@@ -94,6 +95,7 @@ const handleWebhook = async (req, res) => {
             "Subscription.expiryDate": expiryDate,
             "Subscription.token": 100,
             "Subscription.amount": amount,
+            "Subscription.customerId":customerId
           },
         };
       }

@@ -21,4 +21,13 @@ versionRoute.use("/getProfileData", getProductRouter);
 const GetAllGeneratedImagesRouter = require("./getAllGeneratedImages");
 versionRoute.use("/getAllGeneratedImagesData", GetAllGeneratedImagesRouter);
 
+const saveGeneratedImageDataR = require("./saveGeneratedImageDataR");
+versionRoute.use("/saveGeneratedImageData", saveGeneratedImageDataR);
+
+const getCustomerPortalR = require('./getCustomerPortalR')
+versionRoute.use('/getCustomerPortalR', getCustomerPortalR)
+
+// const removeRouterR = require("./removeLogout")
+// versionRoute.use("/removeRouterR", removeRouterR)
+
 module.exports = versionRoute;

@@ -42,5 +42,8 @@ import s3 from '../assets/usecase/s2.jpeg'
 import s4 from '../assets/usecase/s3.jpeg'
 import s5 from '../assets/usecase/s4.jpeg'
 
+import video from '../assets/video.mp4'
+
 export default w2;
-export { w1, w3, w4,w5,down,right,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,m1,m2,m3,m4,m5,p1,p2,p3,p4,p5,v1,v2,v3,v4,v5,s1,s2,s3,s4,s5 };
+export { w1, w3, w4, w5, down, right, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, m1, m2, m3, m4, m5, p1, p2, p3, p4, p5, v1, v2, v3, v4, v5, s1, s2, s3, s4, s5, video };
+

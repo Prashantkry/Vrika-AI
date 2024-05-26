@@ -16,34 +16,98 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProfileDashboard from "../components/ProfileDashboard";
 import { useSelector } from "react-redux";
+import { Cookies, useCookies } from "react-cookie";
 
 let maxLimit = 500;
 let textContent = "";
 let nTextContent = "";
 let inputFile;
 let imageData;
+let backendContent;
 
 let imageArray = [w1, w3, w4, w5, w2, a1, a2, a3, a4, a5];
 
 const ImageGeneration = () => {
-  // check authorization 1st start
-  const [setMessage] = useState();
-  const navigate = useNavigate();
-  axios.defaults.withCredentials = true;
-  useEffect(() => {
-    axios
-      .get("https://vrika-ai.onrender.com/api/v1/generateImageT3DM")
-      .then((res) => {
-        console.log("res -> ", res);
-        if (res.data.valid === true) {
-          setMessage(res.data.message);
-        } else {
-          navigate("/signIn");
-        }
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  // check authorization 1st start  // FIXME depricated
+  // const [setMessage] = useState();
+  // const navigate = useNavigate();`  `
+  // axios.defaults.withCredentials = true;
+  // useEffect(() => {
+  //   axios
+  //     .get("https://vrika-ai.onrender.com/api/v1/generateImageT3DM")
+  //     .then((res) => {
+  //       console.log("res -> ", res);
+  //       if (res.data.valid === true) {
+  //         setMessage(res.data.message);
+  //       } else {
+  //         navigate("/signIn");
+  //       }
+  //     })
+  //     .catch((err) => console.log(err));
+  // }, []);
   // check authorization 1st end
+
+  // ! setting auth from cookie by reading cookie data and protecting page from getting accessed 
+  const [cookies, setCookie, removeCookie] = useCookies(['refreshJWTToken', 'accessToken']);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!cookies['accessToken']) {
+      navigate('/signin');
+    }
+  }, []);
+
+
+  // ! page protection start
+  useEffect(() => {
+    // Disable right-click
+    const disableRightClick = (event) => {
+      if (event.button === 2) {
+        event.preventDefault();
+        // alert("Page is protected!");
+        return false;
+      }
+    };
+    window.addEventListener('contextmenu', disableRightClick);
+
+    // Disable specific key combinations
+    const disableKeys = (event) => {
+      if (
+        (event.ctrlKey && event.shiftKey && event.key === 'I') || // Ctrl+Shift+I
+        (event.ctrlKey && event.shiftKey && event.key === 'C') || // Ctrl+Shift+C
+        (event.ctrlKey && event.shiftKey && event.key === 'J') || // Ctrl+Shift+J
+        (event.key === 'F12') || // F12
+        (event.ctrlKey && event.key === 'S') || // Ctrl+S
+        (event.metaKey && event.key === 'S') || // Command+S (for Mac)
+        (event.ctrlKey && event.key === 's') || // Ctrl+S
+        (event.metaKey && event.key === 's') // Command+S (for Mac)
+      ) {
+        event.preventDefault();
+        // alert("Page is protected can't use Inspect mode disabled!");
+        // alert("Page is protected!");
+        return false;
+      }
+    };
+    window.addEventListener('keydown', disableKeys);
+
+    // Check if dev tools are opened
+    const checkDevTools = () => {
+      if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+        document.body.innerHTML = '<h1>Dev Tools are not allowed!</h1>';
+      }
+    };
+    const devToolsCheckInterval = setInterval(checkDevTools, 1000);
+
+    // Clean up event listeners and interval on unmount
+    return () => {
+      window.removeEventListener('contextmenu', disableRightClick);
+      window.removeEventListener('keydown', disableKeys);
+      clearInterval(devToolsCheckInterval);
+    };
+  }, []);
+
+  // ! page protection end 
+
 
   const [positivePrompts, setPositivePrompts] = useState("");
   const [negativePrompts, setNegativePrompts] = useState("");
@@ -252,6 +316,22 @@ const ImageGeneration = () => {
   let userId = useSelector((state) => state.Login.UserId);
   // end
 
+  // content for image generations 
+  backendContent = {
+    textContent:
+      positivePrompts ||
+      "realistic, cinematic lighting, photorealistic, hyper-realistic, 3d rendering, render, 8k, 16k, extremely detailed, unreal engine, octane, maya",
+    nTextContent:
+      negativePrompts ||
+      "blurry, (distorted), unrealistic, white floor, untextured, cars",
+    seed: seed.toString() || "-1",
+    guidance_scale: promptWeight || 1,
+    num_outputs: ImagesNosCount || 1,
+    controlnet_conditioning_scale: ControlWeight || 1,
+    UserID_: userId,
+  };
+  // console.log(backendContent);
+
   // ! generate imasge start
   const generate = async () => {
     setIsGenerating(true);
@@ -262,21 +342,6 @@ const ImageGeneration = () => {
     setShowImageGeneration(true);
 
     console.log(userId);
-
-    const backendContent = {
-      textContent:
-        positivePrompts ||
-        "realistic, cinematic lighting, photorealistic, hyper-realistic, 3d rendering, render, 8k, 16k, extremely detailed, unreal engine, octane, maya",
-      nTextContent:
-        negativePrompts ||
-        "blurry, (distorted), unrealistic, white floor, untextured, cars",
-      seed: seed.toString() || "-1",
-      guidance_scale: promptWeight || 1,
-      num_outputs: ImagesNosCount || 1,
-      controlnet_conditioning_scale: ControlWeight || 1,
-      UserID_: userId,
-    };
-    console.log(backendContent);
 
     const response = await fetch("https://vrika-ai.onrender.com/api/v1/generateImage", {
       method: "POST",
@@ -299,52 +364,35 @@ const ImageGeneration = () => {
     ]);
     console.log(image);
 
-    // for mongo db extractions
-    const InfoJson = {
-      // input: {
-      //   controlnet_1: apiRes.imageData.GenAiImageData.input.controlnet_1,
-      //   controlnet_1_conditioning_scale:
-      //     apiRes.imageData.GenAiImageData.input.controlnet_1_conditioning_scale,
-      //   controlnet_1_end:
-      //     apiRes.imageData.GenAiImageData.input.controlnet_1_end,
-      //   controlnet_1_start:
-      //     apiRes.imageData.GenAiImageData.input.controlnet_1_start,
-      //   controlnet_2: apiRes.imageData.GenAiImageData.input.controlnet_2,
-      //   controlnet_2_conditioning_scale:
-      //     apiRes.imageData.GenAiImageData.input.controlnet_2_conditioning_scale,
-      //   controlnet_2_end:
-      //     apiRes.imageData.GenAiImageData.input.controlnet_2_end,
-      //   controlnet_2_start:
-      //     apiRes.imageData.GenAiImageData.input.controlnet_2_start,
-      //   guidance_scale: apiRes.imageData.GenAiImageData.input.guidance_scale,
-      //   height: apiRes.imageData.GenAiImageData.input.height,
-      //   width: apiRes.imageData.GenAiImageData.input.width,
-      //   prompt: apiRes.imageData.GenAiImageData.input.prompt,
-      //   negative_prompt: apiRes.imageData.GenAiImageData.input.negative_prompt,
-      //   num_inference_steps:
-      //     apiRes.imageData.GenAiImageData.input.num_inference_steps,
-      //   num_outputs: apiRes.imageData.GenAiImageData.input.num_outputs,
-      //   refine: apiRes.imageData.GenAiImageData.input.refine,
-      //   refine_steps: apiRes.imageData.GenAiImageData.input.refine_steps,
-      //   scheduler: apiRes.imageData.GenAiImageData.input.scheduler,
-      //   seed: apiRes.imageData.GenAiImageData.input.seed,
-      //   sizing_strategy: apiRes.imageData.GenAiImageData.input.sizing_strategy,
-      // },
-      // created_at: apiRes.imageData.GenAiImageData.created_at,
-      // started_at: apiRes.imageData.GenAiImageData.started_at,
-      // completed_at: apiRes.imageData.GenAiImageData.completed_at,
-      // metrics: {
-      //   predict_time: apiRes.imageData.GenAiImageData.metrics.predict_time,
-      // },
-      // images: apiRes.imageData.GenAiImageData.output,
-    };
-    // console.log("InfoJson => ", InfoJson);
+    if (imageData) {    // TODO -> fix image data  
+      setTimeout(() => {
+        sendImageData()
+      }, 2000)
+    }
   };
   // ! end
 
+  // ! send image data to store in mongo db 
+  const sendImageData = async () => {
+    console.log("image===========/=>", image)
+    console.log("save image F trig")
+    const send = await fetch("https://vrika-ai.onrender.com/api/v1/saveGeneratedImageData", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        imageArrayData: image,
+        backendContent
+      })
+    })
+    console.log("recevied data after saving image ", send)
+  }
+  // ! end 
+
   // ! showing image data in main view port start
   const showImage = (index) => {
-    imageData = image[index];
+    imageData = index
     console.log(index);
     if (index === selectedImageIndex) {
       // Toggle through images if the same image is clicked
@@ -426,11 +474,12 @@ const ImageGeneration = () => {
     setControlWeight(sendImageInformations.ControlWeight);
     setSeed(sendImageInformations.seed);
   }
-  // replicate image data from 1 to another end
+  // replicate image data from 1 to another end 
 
   return (
     <>
       <main>
+        {/* <button className="border p-1 bg-green-400" onClick={sendImageData}>sendImageData</button> */}
         <div className="relative border-0 h-[92vh] p-2 w-full bg-slate-950">
           <div className="flex flex-row-reverse h-full items-center justify-between">
             {/* side tools start*/}
@@ -438,7 +487,7 @@ const ImageGeneration = () => {
               {/* generation related data start */}
               <div>
                 {/* Project */}
-                <button
+                {/* <button
                   className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded "
                   onClick={toggleProject}
                 >
@@ -452,7 +501,7 @@ const ImageGeneration = () => {
                       d="M368 80h32v32H368V80zM352 32c-17.7 0-32 14.3-32 32H128c0-17.7-14.3-32-32-32H32C14.3 32 0 46.3 0 64v64c0 17.7 14.3 32 32 32V352c-17.7 0-32 14.3-32 32v64c0 17.7 14.3 32 32 32H96c17.7 0 32-14.3 32-32H320c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V384c0-17.7-14.3-32-32-32V160c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32H352zM96 160c17.7 0 32-14.3 32-32H320c0 17.7 14.3 32 32 32V352c-17.7 0-32 14.3-32 32H128c0-17.7-14.3-32-32-32V160zM48 400H80v32H48V400zm320 32V400h32v32H368zM48 112V80H80v32H48z"
                     />
                   </svg>
-                </button>
+                </button> */}
 
                 {/* create new generate image dashboard */}
                 <button
@@ -496,7 +545,7 @@ const ImageGeneration = () => {
 
                 {/* model start */}
                 {help && (
-                  <div className="w-[20vw] absolute h-fit px-2 rounded text-gray-300 -ml-[22vw] -mt-[27vh] border-gray-950 bg-gray-950 border">
+                  <div className="w-[20vw] z-50 absolute h-fit px-2 rounded text-gray-300 -ml-[22vw] -mt-[27vh] border-gray-950 bg-gray-950 border">
                     <form action="" className="leading-10 px-2">
                       <div className="my-2">
                         <label htmlFor="name" className="mr-2">
@@ -557,7 +606,9 @@ const ImageGeneration = () => {
                 </div>
 
                 {/* profile */}
-                <div className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded ">
+                <button
+                  onClick={toggleProject}
+                  className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 448 512"
@@ -568,7 +619,7 @@ const ImageGeneration = () => {
                       d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464H398.7c-8.9-63.3-63.3-112-129-112H178.3c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304h91.4C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7H29.7C13.3 512 0 498.7 0 482.3z"
                     />
                   </svg>
-                </div>
+                </button>
               </div>
               {/* user related data end */}
             </div>
@@ -779,9 +830,10 @@ const ImageGeneration = () => {
                               rows="4"
                               placeholder="positive prompts"
                               className="bg-transparent outline-none  w-full p-2 text-gray-200 overflow-scroll no-scrollbar"
-                              onChange={(e) =>
-                                handleTextRemainingCharacters(e.target.value)
-                              }
+                              onChange={(e) => {
+                                handleTextRemainingCharacters(e.target.value);
+                                setPositivePrompts(e.target.value)
+                              }}
                               maxLength={maxLimit}
                             />
                             <p className="remainingCharacters text-xs relative float-right mr-1.5 text-gray-500">
@@ -795,12 +847,13 @@ const ImageGeneration = () => {
                               rows="4"
                               placeholder="negative prompts"
                               className="bg-transparent outline-none w-full p-2 text-gray-200 overflow-scroll no-scrollbar"
-                              onChange={(e) =>
+                              onChange={(e) => {
                                 handleTextRemainingCharacters(
                                   e.target.value,
                                   true
-                                )
-                              }
+                                );
+                                setNegativePrompts(e.target.value)
+                              }}
                               maxLength={maxLimit}
                             />
                             <p className="remainingCharacters text-xs relative float-right mr-1.5 text-gray-500">
@@ -1041,7 +1094,7 @@ const ImageGeneration = () => {
                                   src={imag}
                                   alt=""
                                   className="w-[200px] h-[200px] border rounded "
-                                  onClick={() => showImage(imag)}
+                                  onClick={() =>{ showImage(imag), (imageData = imag)}}
                                 />
                               ))}
                             </div>

@@ -1,22 +1,24 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import w5 from "./Image";
 import { useDispatch, useSelector } from "react-redux";
 import { setSignedIn } from "../Redux/SignIn";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
 
 let loginStatus;
 const Navbar = () => {
-  const [activeLink, setActiveLink] = useState("/");
+  const [cookies, setCookie, removeCookie] = useCookies(['refreshJWTToken', 'accessToken']);
 
   const dispatch = useDispatch();
   loginStatus = useSelector((state) => state.Login.SignedIn);
-  console.log("loginStatus -> ", loginStatus);
-  function handleLogout() {
-    console.log(loginStatus);
+
+  async function handleLogout() {
     dispatch(setSignedIn(false));
-    console.log(loginStatus);
+    removeCookie('refreshJWTToken')
+    removeCookie('accessToken')
     window.location.href = "/signIn";
   }
+
   return (
     <>
       <section className="w-full h-[8vh] px-10">
@@ -30,89 +32,67 @@ const Navbar = () => {
             />
           </div>
           <div className="flex justify-around border-0 w-[30vw] items-center">
-            <Link
+            <NavLink
               to="/"
-              className={`tracking-wide ${
-                activeLink === "/"
-                  ? "text-indigo-500 border-b-2 border-indigo-500"
-                  : "text-white"
-              }`}
-              onClick={() => setActiveLink("/")}
+              className={({ isActive }) =>
+                isActive ? "text-indigo-500 border-b-2 border-indigo-500" : "text-white"
+              }
             >
               Home
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/Image3DImage"
-              className={`tracking-wide ${
-                activeLink === "/Image3DImage"
-                  ? "text-indigo-500 border-b-2 border-indigo-500"
-                  : "text-white"
-              }`}
-              onClick={() => setActiveLink("/Image3DImage")}
+              className={({ isActive }) =>
+                isActive ? "text-indigo-500 border-b-2 border-indigo-500" : "text-white"
+              }
             >
               Generate Image
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/Plans"
-              className={`tracking-wide ${
-                activeLink === "/Plans"
-                  ? "text-indigo-500 border-b-2 border-indigo-500"
-                  : "text-white"
-              }`}
-              onClick={() => setActiveLink("/Plans")}
+              className={({ isActive }) =>
+                isActive ? "text-indigo-500 border-b-2 border-indigo-500" : "text-white"
+              }
             >
               Price
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/about"
-              className={`tracking-wide ${
-                activeLink === "/about"
-                  ? "text-indigo-500 border-b-2 border-indigo-500"
-                  : "text-white"
-              }`}
-              onClick={() => setActiveLink("/about")}
+              className={({ isActive }) =>
+                isActive ? "text-indigo-500 border-b-2 border-indigo-500" : "text-white"
+              }
             >
               About Us
-            </Link>
+            </NavLink>
 
-            <Link
+            <NavLink
               to="/contact"
-              className={`tracking-wide ${
-                activeLink === "/contact"
-                  ? "text-indigo-500 border-b-2 border-indigo-500"
-                  : "text-white"
-              }`}
-              onClick={() => setActiveLink("/contact")}
+              className={({ isActive }) =>
+                isActive ? "text-indigo-500 border-b-2 border-indigo-500" : "text-white"
+              }
             >
               Contact
-            </Link>
+            </NavLink>
 
             {loginStatus ? (
               <button
-                className={`tracking-wide ${
-                  activeLink === "/signIn"
-                    ? "text-indigo-500 border-b-2 border-indigo-500"
-                    : "text-white"
-                }`}
+                className="text-white"
                 onClick={handleLogout}
               >
                 Log Out
               </button>
             ) : (
-              <Link
+              <NavLink
                 to="/signIn"
-                className={`tracking-wide ${
-                  activeLink === "/signIn"
-                    ? "text-indigo-500 border-b-2 border-indigo-500"
-                    : "text-white"
-                }`}
-                onClick={() => setActiveLink("/signIn")}
+                className={({ isActive }) =>
+                  isActive ? "text-indigo-500 border-b-2 border-indigo-500" : "text-white"
+                }
               >
                 Sign In
-              </Link>
+              </NavLink>
             )}
           </div>
         </nav>

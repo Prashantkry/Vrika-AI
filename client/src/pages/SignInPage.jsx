@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../App.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useCookies } from "react-cookie";
+import { Cookies, useCookies } from "react-cookie";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setSignedIn } from "../Redux/SignIn";
@@ -15,7 +15,7 @@ import { setUserId } from "../Redux/SignIn";
 const APIUrl = "https://vrika-ai.onrender.com/api/v1";
 
 export default function SignInPage() {
-  const [cookies, setCookie] = useCookies(["token"]);
+  const [,setCookie] = useCookies(['refreshJWTToken', 'accessToken']);
 
   axios.defaults.withCredentials = true;
 
@@ -35,13 +35,13 @@ export default function SignInPage() {
         Password,
       });
       console.log("data", data);
-
       const UserId = data.data.UserId;
-      const UserEmail = data.UserEmail;
+      // const UserEmail = data.UserEmail;
 
       if (data.data.success === true) {
         toast.success("Login Successful");
-        
+        setCookie('refreshJWTToken', data.data.refreshJWTToken)
+        setCookie('accessToken', data.data.accessToken)
         setTimeout(() => {
           navigate(`/`);
         }, 1000);

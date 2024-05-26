@@ -78,98 +78,121 @@ const LoginController = async (req, res) => {
   const body = req.body;
   // console.log("body -> ", body);
   const { Email, Password } = body;
+  try {
+    const userData = await UserSchema.findOne({ email: Email });
+    // console.log(userData);
+    if (userData && (await bcrypt.compare(Password, userData.password))) {
+      console.log("Correct Credential");
 
-  const userData = await UserSchema.findOne({ email: Email });
-  // console.log(userData);
-  if (userData && (await bcrypt.compare(Password, userData.password))) {
-    console.log("Correct Credential");
+      // expiry of timer of token jwt
+      // const accessTokenExpiry = Math.floor(Date.now() / 1000) + 60 * 60; // 1 hour from now
+      // const refreshTokenExpiry = Math.floor(Date.now() / 1000) + 24 * 60 * 60; // 1 day from now
 
-    // * creating jwt token
-    const accessToken = jwt.sign(
-      {
-        // accept payload & secret key
-        id: userData._id,
-        email: Email,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" } // 1d => 1 day || 2h can be many after that token will expire
-    );
-    // console.log(accessToken);
+      // * creating jwt token
+      const accessToken = jwt.sign(
+        {
+          // accept payload & secret key
+          id: userData._id,
+          email: Email,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" } // 1d => 1 day || 2h can be many after that token will expire
+        // { expiresIn: accessTokenExpiry } // 1d => 1 day || 2h can be many after that token will expire
+      );
+      // console.log(accessToken);
 
-    // refresh jwt token
-    const refreshJWTToken = jwt.sign(
-      {
-        id: userData._id,
-        email: Email,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+      // refresh jwt token
+      const refreshJWTToken = jwt.sign(
+        {
+          id: userData._id,
+          email: Email,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+        // { expiresIn: refreshTokenExpiry }
+      );
 
-    // updating jwt token in user database
-    const updateQuery = {
-      $set: {
-        jwtToken: accessToken,
-        jwtRefreshToken: refreshJWTToken,
-      },
-    };
-    const updateRes = await UserSchema.updateOne(
-      {
-        _id: userData._id,
-      },
-      updateQuery
-    );
-    // console.log(updateRes);
+      // updating jwt token in user database
+      const updateQuery = {
+        $set: {
+          jwtToken: accessToken,
+          jwtRefreshToken: refreshJWTToken,
+        },
+      };
+      await UserSchema.updateOne(
+        {
+          _id: userData._id,
+        },
+        updateQuery
+      );
+      // console.log(updateRes);
 
-    // * cookie work handled here start
-    const options = {
-      expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // durations -> 1 * 24 * 60 * 60 * 1000  days,hrs,min,sec,miliSec
-      // expires: new Date(Date.now() + 300000), // durations -> 1 * 24 * 60 * 60 * 1000  days,hrs,min,sec,miliSec
-      httpOnly: false, // true -> make cookie secure or encrypted & can be manipulated by server not by user
-    };
+      // * cookie work handled here start
+      // const options = {
+      //   expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // durations -> 1 * 24 * 60 * 60 * 1000  days,hrs,min,sec,miliSec
+      //   // expires: new Date(Date.now() + 300000), // durations -> 1 * 24 * 60 * 60 * 1000  days,hrs,min,sec,miliSec
+      //   httpOnly: false, // true -> make cookie secure or encrypted & can be manipulated by server not by user
+      // };
 
-    const rOptions = {
-      expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
-      httpOnly: false,
-      secure: true,
-      sameSite: "strict",
-    };
+      // const rOptions = {
+      //   expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+      //   httpOnly: false,
+      //   secure: true,
+      //   sameSite: "strict",
+      // };
 
-    res.cookie("refreshJWTToken", refreshJWTToken, rOptions);
-    res.cookie("accessToken", accessToken, options);
-    return res.json({
-      success: true,
-      message: "Login Successful",
-      UserId: userData.UserId,
-      UserEmail: userData.Email,
-    });
+      // res.cookie("refreshJWTToken", refreshJWTToken, rOptions);
+      // res.cookie("accessToken", accessToken, options);
 
-    // * end
-  } else {
-    return res
-      .status(400)
-      .json({ success: false, message: "Enter valid email or password" });
+      // console.log(
+      //   "refreshJWTToken => ", refreshJWTToken,
+      //   "accessToken => ", accessToken
+      // )
+
+      return res.json({
+        success: true,
+        message: "Login Successful",
+        UserId: userData.UserId,
+        UserEmail: userData.Email,
+        "refreshJWTToken": refreshJWTToken,
+        "accessToken": accessToken
+      });
+
+      // * end
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, message: "Enter valid email or password" });
+    }
+  } catch (error) {
+    console.log(error)
   }
+
 };
 // * end
 
 // ! for private verification of token
 const verifyUser = (req, res, next) => {
   const accessToken = req.cookies.accessToken;
-  if (!accessToken) {
-    if (renewToken(req, res)) {
-      next();
-    }
-  } else {
-    jwt.verify(accessToken, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        return res.json({ valid: false, message: "Invalid Token" });
-      } else {
-        req.email = decoded.email;
+  try {
+    if (!accessToken) {
+      if (renewToken(req, res)) {
         next();
       }
-    });
+    } else {
+      jwt.verify(accessToken, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          return res.json({ valid: false, message: "Invalid Token" });
+        } else {
+          req.email = decoded.email;
+          next();
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error)
   }
+
 };
 
 const renewToken = (req, res) => {
@@ -196,7 +219,11 @@ const renewToken = (req, res) => {
 
 // ! making routes protected
 const verifyAuth = async (req, res) => {
-  return res.json({ valid: true, message: "authorized" });
+  try {
+    return res.json({ valid: true, message: "authorized" });
+  } catch (error) {
+    console.log(error)
+  }
 };
 // * end
 
