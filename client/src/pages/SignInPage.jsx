@@ -15,7 +15,7 @@ import { setUserId } from "../Redux/SignIn";
 const APIUrl = "https://vrika-ai.onrender.com/api/v1";
 
 export default function SignInPage() {
-  const [,setCookie] = useCookies(['refreshJWTToken', 'accessToken']);
+  const [, setCookie] = useCookies(['refreshJWTToken', 'accessToken']);
 
   axios.defaults.withCredentials = true;
 
@@ -60,16 +60,16 @@ export default function SignInPage() {
     }
   };
 
-  // google login implement
-  async function googleLogin() {
-    window.open("http://localhost:8000/auth/google/callback", "_self");
-  }
+  // google login implement   // TODO not in use for now 
+  // async function googleLogin() {
+  //   window.open("https://vrika-ai.onrender.com/auth/google/callback", "_self");
+  // }
 
   const [showpass, setShowPass] = useState(false);
   return (
     <>
       <ToastContainer />
-      <div className="bg-gray-950 h-[84vh] ">
+      <div className="bg-gray-950 h-[84vh]">
         <div className="xl:px-20 md:px-10 sm:px-6 px-4 md:py-12 py-9 2xl:mx-auto 2xl:container md:flex items-center justify-center signIn">
           {/* login form start */}
           <div className="bg-gray-900 shadow-lg rounded mt-10 xl:w-1/3 lg:w-5/12 md:w-1/2 w-full lg:px-10 sm:px-6 sm:py-10 px-2 py-6">
@@ -92,7 +92,7 @@ export default function SignInPage() {
               </Link>
             </p>
             {/* google login start */}
-            <button
+            {/* <button
               aria-label="Continue with google"
               role="button"
               className="focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-700 p-3 border rounded-lg border-gray-700 flex items-center w-full mt-10 hover:bg-gray-100 hover:text-gray-800 text-gray-300"
@@ -123,18 +123,18 @@ export default function SignInPage() {
                 />
               </svg>
               <p className="text-base font-medium ml-4">Continue with Google</p>
-            </button>
+            </button> */}
             {/* google login end */}
 
-            <div className="w-full flex items-center justify-between py-5">
+            {/* <div className="w-full flex items-center justify-between py-5">
               <hr className="w-full bg-gray-400" />
               <p className="text-base font-medium leading-4 px-2.5 text-gray-500">
                 OR
               </p>
               <hr className="w-full bg-gray-400" />
-            </div>
+            </div> */}
             {/* email id password  */}
-            <div>
+            <div className="mt-4">
               <label
                 htmlFor="email"
                 className="text-sm font-medium leading-none text-gray-400"
