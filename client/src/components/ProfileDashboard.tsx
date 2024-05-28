@@ -18,7 +18,7 @@ import w2, {
 
 let imageArray = [w1, w3, w4, w5, w2, a1, a2, a3, a4, a5];
 let imageData
-let customerId
+let customerId, dataOfImage
 
 const ProfileDashboard = () => {
   const navigate = useNavigate()
@@ -31,9 +31,7 @@ const ProfileDashboard = () => {
   const [viewImage, setViewImage] = useState(null)
 
   useEffect(() => {
-    console.log('useeffect ..............')
     const fetchProfileData = async () => {
-      console.log('fontend')
       const ProfileFetchedData = await fetch('https://vrika-ai.onrender.com/api/v1/getProfileData', {
         method: 'POST',
         headers: {
@@ -57,11 +55,6 @@ const ProfileDashboard = () => {
     }
   }, [])
 
-
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  };
-
   // ! get all generated images from mongo db start
   useEffect(() => {
     const generatedImages = async () => {
@@ -77,7 +70,8 @@ const ProfileDashboard = () => {
       })
 
       const data = await res.json()
-      console.log(data)
+      // console.log(data)
+      dataOfImage = data
 
       customerId = data.customerId
 
@@ -122,6 +116,7 @@ const ProfileDashboard = () => {
   // end
 
 
+  // ! redirect to customer portal of payment management 
   async function redirectToUpgrade() {
     //   // window.location.href("https://billing.stripe.com/p/login/test_3cs6rlbZn7093PG9AA")
     console.log("customerId => ", customerId)
@@ -196,23 +191,31 @@ const ProfileDashboard = () => {
               placeholder="Search images"
             />
           </div>
+
           {/* content */}
           <div className="w-full h-[90vh] ">
             <div className="w-full h-[75vh] border-t border-gray-700 grid xl:grid-cols-3 gap-3 p-10 z-30 overflow-scroll no-scrollbar">
-              {imagesGenerated.map((e, i) => (
-                <div
-                  key={i}
-                  className=" h-[300px] border p-2 rounded-xl border-gray-800"
-                >
-                  <img
-                    src={e.url}
-                    alt=""
-                    className=" rounded-xl w-full h-full"
-                    onClick={() => showHideBigImage(i)}
-                  />
-                </div>
-              ))}
-              {/* big view of images */}
+              {
+                dataOfImage ? (
+                  imagesGenerated.map((e, i) => (
+                    <div
+                      key={i}
+                      className=" h-[300px] border p-2 rounded-xl border-gray-800"
+                    >
+                      <img
+                        src={e.url}
+                        alt=""
+                        className=" rounded-xl w-full h-full"
+                        onClick={() => showHideBigImage(i)}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="loader"></div>
+                )
+              }
+
+              {/* big view of images pop model*/}
               {viewImage !== null && (
                 <div className='absolute inset-0 flex items-center justify-center m-5 p-2 w-[90%] h-[90%] mx-auto my-auto rounded bg-gray-950 border-2 border-gray-900' onClick={() => showHideBigImage(viewImage)}>
                   <img src={imagesGenerated[viewImage].url} alt="" className='w-[70%] h-full rounded' id='viewImages' />

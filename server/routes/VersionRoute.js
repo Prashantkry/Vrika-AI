@@ -18,6 +18,9 @@ versionRoute.use("/payment", paymentRoute);
 const getProductRouter = require("./ProfileDataRoute");
 versionRoute.use("/getProfileData", getProductRouter);
 
+const getProductCreditsRouter = require("./ProfileRouteCredits");
+versionRoute.use("/getProfileDataCredits", getProductCreditsRouter);
+
 const GetAllGeneratedImagesRouter = require("./getAllGeneratedImages");
 versionRoute.use("/getAllGeneratedImagesData", GetAllGeneratedImagesRouter);
 

@@ -33,7 +33,7 @@ const signUpController = async (req, res) => {
         status: false,
         purchaseDate: "",
         expiryDate: "",
-        token: 0,
+        token: 1,
         amount: 0,
       },
     });

@@ -28,7 +28,7 @@ let backendContent;
 let imageArray = [w1, w3, w4, w5, w2, a1, a2, a3, a4, a5];
 
 const ImageGeneration = () => {
-  // check authorization 1st start  // FIXME depricated
+  // check authorization 1st start  // FIXME depericated
   // const [setMessage] = useState();
   // const navigate = useNavigate();`  `
   // axios.defaults.withCredentials = true;
@@ -47,6 +47,12 @@ const ImageGeneration = () => {
   // }, []);
   // check authorization 1st end
 
+  // ! get user id form redux store start
+  let userId = useSelector((state) => state.Login.UserId);
+  // console.log("userId => ", userId)
+  // end
+
+
   // ! setting auth from cookie by reading cookie data and protecting page from getting accessed 
   const [cookies, setCookie, removeCookie] = useCookies(['refreshJWTToken', 'accessToken']);
   const navigate = useNavigate();
@@ -59,52 +65,52 @@ const ImageGeneration = () => {
 
 
   // ! page protection start
-  useEffect(() => {
-    // Disable right-click
-    const disableRightClick = (event) => {
-      if (event.button === 2) {
-        event.preventDefault();
-        // alert("Page is protected!");
-        return false;
-      }
-    };
-    window.addEventListener('contextmenu', disableRightClick);
+  // useEffect(() => {
+  //   // Disable right-click
+  //   const disableRightClick = (event) => {
+  //     if (event.button === 2) {
+  //       event.preventDefault();
+  //       // alert("Page is protected!");
+  //       return false;
+  //     }
+  //   };
+  //   window.addEventListener('contextmenu', disableRightClick);
 
-    // Disable specific key combinations
-    const disableKeys = (event) => {
-      if (
-        (event.ctrlKey && event.shiftKey && event.key === 'I') || // Ctrl+Shift+I
-        (event.ctrlKey && event.shiftKey && event.key === 'C') || // Ctrl+Shift+C
-        (event.ctrlKey && event.shiftKey && event.key === 'J') || // Ctrl+Shift+J
-        (event.key === 'F12') || // F12
-        (event.ctrlKey && event.key === 'S') || // Ctrl+S
-        (event.metaKey && event.key === 'S') || // Command+S (for Mac)
-        (event.ctrlKey && event.key === 's') || // Ctrl+S
-        (event.metaKey && event.key === 's') // Command+S (for Mac)
-      ) {
-        event.preventDefault();
-        // alert("Page is protected can't use Inspect mode disabled!");
-        // alert("Page is protected!");
-        return false;
-      }
-    };
-    window.addEventListener('keydown', disableKeys);
+  //   // Disable specific key combinations
+  //   const disableKeys = (event) => {
+  //     if (
+  //       (event.ctrlKey && event.shiftKey && event.key === 'I') || // Ctrl+Shift+I
+  //       (event.ctrlKey && event.shiftKey && event.key === 'C') || // Ctrl+Shift+C
+  //       (event.ctrlKey && event.shiftKey && event.key === 'J') || // Ctrl+Shift+J
+  //       (event.key === 'F12') || // F12
+  //       (event.ctrlKey && event.key === 'S') || // Ctrl+S
+  //       (event.metaKey && event.key === 'S') || // Command+S (for Mac)
+  //       (event.ctrlKey && event.key === 's') || // Ctrl+S
+  //       (event.metaKey && event.key === 's') // Command+S (for Mac)
+  //     ) {
+  //       event.preventDefault();
+  //       // alert("Page is protected can't use Inspect mode disabled!");
+  //       // alert("Page is protected!");
+  //       return false;
+  //     }
+  //   };
+  //   window.addEventListener('keydown', disableKeys);
 
-    // Check if dev tools are opened
-    const checkDevTools = () => {
-      if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
-        document.body.innerHTML = '<h1>Dev Tools are not allowed!</h1>';
-      }
-    };
-    const devToolsCheckInterval = setInterval(checkDevTools, 1000);
+  //   // Check if dev tools are opened
+  //   const checkDevTools = () => {
+  //     if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+  //       document.body.innerHTML = '<h1>Dev Tools are not allowed!</h1>';
+  //     }
+  //   };
+  //   const devToolsCheckInterval = setInterval(checkDevTools, 1000);
 
-    // Clean up event listeners and interval on unmount
-    return () => {
-      window.removeEventListener('contextmenu', disableRightClick);
-      window.removeEventListener('keydown', disableKeys);
-      clearInterval(devToolsCheckInterval);
-    };
-  }, []);
+  //   // Clean up event listeners and interval on unmount
+  //   return () => {
+  //     window.removeEventListener('contextmenu', disableRightClick);
+  //     window.removeEventListener('keydown', disableKeys);
+  //     clearInterval(devToolsCheckInterval);
+  //   };
+  // }, []);
 
   // ! page protection end 
 
@@ -142,6 +148,8 @@ const ImageGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+
+  const [credits, setCredits] = useState(0)
 
   // handle remianing characters in prompts textarea
   function handleTextRemainingCharacters(text, isNegative = false) {
@@ -312,10 +320,6 @@ const ImageGeneration = () => {
 
   // ! drag and drop for image and 3-D model in image generation dashboard end
 
-  // get user id form redux store start
-  let userId = useSelector((state) => state.Login.UserId);
-  // end
-
   // content for image generations 
   backendContent = {
     textContent:
@@ -332,7 +336,28 @@ const ImageGeneration = () => {
   };
   // console.log(backendContent);
 
-  // ! generate imasge start
+  // ! fetch credits of user 
+  async function fetchCredit() {
+    // console.log(userId)
+    const creditData = await fetch("https://vrika-ai.onrender.com/api/v1/getProfileDataCredits", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",      
+      },
+      body:JSON.stringify({
+        userId
+      })
+    })
+    const credits_ =await creditData.json()
+    const credits__ = credits_.Credits
+    setCredits(credits__)
+  }
+
+  useEffect(() => {
+    fetchCredit()
+  }, [userId])
+
+  // ! generate image start
   const generate = async () => {
     setIsGenerating(true);
     setIsGeneratedVisible(true);
@@ -343,31 +368,36 @@ const ImageGeneration = () => {
 
     console.log(userId);
 
-    const response = await fetch("https://vrika-ai.onrender.com/api/v1/generateImage", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        backendContent,
-      }),
-    });
-    const apiRes = await response.json();
-    console.log("apiRes => ", apiRes);
-    setIsGenerating(false);
-    const imageData = apiRes.generatedImageData
-    console.log("imageData => ", imageData);
-    // setImage((prevImages) => [...prevImages, ...imageData]); // when image 
-    setImage((prevImages) => [
-      ...prevImages,
-      ...imageData.map(data => `data:image/png;base64,${data}`)
-    ]);
-    console.log(image);
+    if(credits === 0){
+      navigate("/Plans")
+    }else{
+      console.log("you have subscriptions Image will be generated")
+      const response = await fetch("https://vrika-ai.onrender.com/api/v1/generateImage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          backendContent,
+        }),
+      });
+      const apiRes = await response.json();
+      console.log("apiRes => ", apiRes);
+      setIsGenerating(false);
+      const imageData = apiRes.generatedImageData
+      console.log("imageData => ", imageData);
+      // setImage((prevImages) => [...prevImages, ...imageData]); // when image 
+      setImage((prevImages) => [
+        ...prevImages,
+        ...imageData.map(data => `data:image/png;base64,${data}`)
+      ]);
+      console.log(image); 
 
-    if (imageData) {    // TODO -> fix image data  
-      setTimeout(() => {
-        sendImageData()
-      }, 2000)
+      if (imageData) {    // TODO -> fix image data  
+        setTimeout(() => {
+          sendImageData()
+        }, 2000)
+      }
     }
   };
   // ! end
@@ -411,20 +441,20 @@ const ImageGeneration = () => {
   }, [image, selectedImageIndex]);
   // end
 
-  // resetChoosedImageData start
+  // ! resetChoosedImageData start
   function resetChoosedImageData() {
     setImageSrc("");
     setImageChosen(false);
   }
   // resetChoosedImageData end
 
-  // removeImageVIewPort start
+  // ! removeImageVIewPort start
   function removeImageVIewPort() {
     setSelectedImageIndex("");
   }
   // removeImageVIewPort end
 
-  // show image generated info
+  // ! show image generated info
   function showImageGeneratedInfo(sendImageInformations) {
     // console.log('iData showImageGeneratedInfo -> ',iData)
     console.log("iData showImageGeneratedInfo -> ", sendImageInformations);
@@ -449,7 +479,7 @@ const ImageGeneration = () => {
     // console.log(imageInfoData);
   }
 
-  // download image start
+  // ! download image start
   async function downloadImage(iData) {
     console.log("iData downloadImage -> ", iData);
     const image = await fetch(iData);
@@ -465,7 +495,7 @@ const ImageGeneration = () => {
   }
   // download image end
 
-  // replicate image data from 1 to another start
+  // ! replicate image data from 1 to another start
   async function handleReplicateImage(sendImageInformations) {
     console.log("handleReplicateImage -> ", sendImageInformations);
     textContent = sendImageInformations.Prompt;
@@ -1094,7 +1124,7 @@ const ImageGeneration = () => {
                                   src={imag}
                                   alt=""
                                   className="w-[200px] h-[200px] border rounded "
-                                  onClick={() =>{ showImage(imag), (imageData = imag)}}
+                                  onClick={() => { showImage(imag), (imageData = imag) }}
                                 />
                               ))}
                             </div>
@@ -1142,7 +1172,7 @@ const ImageGeneration = () => {
                   </div>
 
                   <p className="absolute border border-gray-500 flex items-center justify-center rounded w-fit h-fit p-1 px-2 text-xs ml-[24vw]">
-                    01
+                    {credits}
                   </p>
                 </button>
                 {/* generate button end */}

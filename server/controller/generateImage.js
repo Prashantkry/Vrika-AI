@@ -23,6 +23,7 @@ const ImageGenerate = async (req, res) => {
       headers: {
         "Content-Type": "application/json",
         Authorization: CEREBIUMM_Auth,
+        // Authorization: "",
       },
       body: JSON.stringify({
         item: {
@@ -52,6 +53,28 @@ const ImageGenerate = async (req, res) => {
     const result = await data.json();
     // console.log("result => ", result);
     const generatedImageData = result.result
+
+
+    // ! decrement of credits after image generations 
+    const client = await MongoClient.connect(mongoUrl)
+    const userCollectionData = await client.db("VrikaAI").collection("userdetails")
+    const userExist = await userCollectionData.findOne({ UserId: userId })
+    if (userExist) {
+      console.log("userExist => ", userExist)
+      const oldCredits = userExist.Subscription.token
+      console.log("num_outputs ===> ", num_outputs)
+      console.log("oldCredits => ", oldCredits)
+      CreditsDec = oldCredits - num_outputs
+      const upDateCredits = {
+        $set: {
+          "Subscription.token": CreditsDec
+        }
+      }
+      const updatedCredits = await userCollectionData.updateOne({ UserId: userId }, upDateCredits)
+      console.log(updatedCredits)
+    }
+    // credits work end 
+
     return res.status(200).json({
       message: "Generated Image",
       generatedImageData
