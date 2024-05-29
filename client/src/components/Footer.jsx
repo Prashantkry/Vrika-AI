@@ -4,13 +4,13 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <>
-      <div className="bg-black h-[8vh] w-full border-0 flex items-center justify-around text-gray-400">
+      <div className="bg-black footer h-[8vh] w-full border-0 flex items-center justify-around text-gray-400">
         {/* right */}
-        <div className="border-0 text-indigo-500 border-gray-600 w-fit flex items-center h-[5vh] rounded">
+        <div className="border-0 companyTag text-indigo-500 border-gray-600 w-fit flex items-center h-[5vh] rounded">
           All right reserved to VrikAi © 2024
         </div>
         {/* company */}
-        <div className="border-0 border-gray-600 w-fit flex items-center justify-around h-[5vh] rounded">
+        <div className="border-0 companyRoute border-gray-600 w-fit flex items-center justify-around h-[5vh] rounded">
           <Link
             to="contact"
             className="mr-2 text-indigo-500 hover:text-purple-700"
@@ -26,7 +26,7 @@ const Footer = () => {
           </Link>
         </div>
         {/* social */}
-        <div className="flex items-center justify-around border-0 w-[15vw] p-2 ">
+        <div className="flex companySocial items-center justify-around border-0 w-[15vw] p-2 ">
           <svg
             className="w-[32px] h-[32px] border border-purple-900 hover:bg-indigo-950 cursor-pointer rounded-full p-1"
             xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +69,7 @@ const Footer = () => {
           </svg>
         </div>
         {/* subscribe options */}
-        <div className="border border-indigo-600 w-[15vw] h-[5vh] flex items-center justify-around rounded">
+        <div className="border companyS border-indigo-600 w-[15vw] h-[5vh] flex items-center justify-around rounded">
           <input
             type="email"
             placeholder="Subscribe"
