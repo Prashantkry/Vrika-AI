@@ -510,12 +510,12 @@ const ImageGeneration = () => {
     <>
       <main>
         {/* <button className="border p-1 bg-green-400" onClick={sendImageData}>sendImageData</button> */}
-        <div className="relative border-0 h-[92vh] p-2 w-full bg-slate-950">
-          <div className="flex flex-row-reverse h-full items-center justify-between">
+        <div className="relative mainDiv border-0 h-[92vh] p-2 w-full bg-slate-950">
+          <div className="flex flex-row-reverse allTools h-full items-center justify-between">
             {/* side tools start*/}
-            <div className="w-[3.5vw] rounded h-full ml-2 -mr-1 border-0 bg-gray-900 flex items-center justify-between py-5 flex-col">
+            <div className="w-[3.5vw] sideTools rounded h-full ml-2 -mr-1 border-0 bg-gray-900 flex items-center justify-between py-5 flex-col">
               {/* generation related data start */}
-              <div>
+              <div className="">
                 {/* Project */}
                 {/* <button
                   className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded "
@@ -535,13 +535,13 @@ const ImageGeneration = () => {
 
                 {/* create new generate image dashboard */}
                 <button
-                  className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded "
+                  className="w-[35px] h-[35px] sideToolsObject1 sideToolsObject mb-6 flex items-center justify-center hover:bg-purple-950 rounded "
                   onClick={toggleDashboard}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 512 512"
-                    className="w-[22px] h-[22px]"
+                    className="w-[22px] h-[22px] sideToolsObject"
                   >
                     <path
                       fill="#6f1ed2"
@@ -549,22 +549,22 @@ const ImageGeneration = () => {
                     />
                   </svg>
                 </button>
-                <div className="w-full h-[1.5px] bg-gray-800" />
+                <div className="w-full h-[1.5px] bg-gray-800 seperateDiv" />
               </div>
               {/* generation related data end */}
 
               {/* user related data start */}
-              <div className="relative">
-                <div className="w-full h-[1.5px] flex items-center justify-around mb-7 bg-gray-800" />
+              <div className="relative sideTools1">
+                <div className="w-full h-[1.5px] flex items-center justify-around mb-7 bg-gray-800 seperateDiv" />
                 {/* help */}
                 <button
                   onClick={toggleHelp}
-                  className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded "
+                  className="w-[35px] sideToolsObject sideToolsObject1 h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded "
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 320 512"
-                    className=" w-[22px] h-[22px] ring-2 rounded-full p-1 ring-purple-800"
+                    className=" w-[22px] sideToolsObject h-[22px] ring-2 rounded-full p-1 ring-purple-800"
                   >
                     <path
                       fill="#6f1ed2"
@@ -575,7 +575,7 @@ const ImageGeneration = () => {
 
                 {/* model start */}
                 {help && (
-                  <div className="w-[20vw] z-50 absolute h-fit px-2 rounded text-gray-300 -ml-[22vw] -mt-[27vh] border-gray-950 bg-gray-950 border">
+                  <div className="w-[20vw] sideToolsObject sideToolsObject1 z-50 absolute h-fit px-2 rounded text-gray-300 -ml-[22vw] -mt-[27vh] border-gray-950 bg-gray-950 border">
                     <form action="" className="leading-10 px-2">
                       <div className="my-2">
                         <label htmlFor="name" className="mr-2">
@@ -622,11 +622,11 @@ const ImageGeneration = () => {
                 {/* model end */}
 
                 {/* message */}
-                <div className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded ">
+                <div className="w-[35px] h-[35px] sideToolsObject sideToolsObject1 mb-6 flex items-center justify-center hover:bg-purple-950 rounded ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 512 512"
-                    className=" w-[22px] h-[22px] scale-x-[-1]"
+                    className=" w-[22px] sideToolsObject h-[22px] scale-x-[-1]"
                   >
                     <path
                       fill="#6f1ed2"
@@ -638,11 +638,11 @@ const ImageGeneration = () => {
                 {/* profile */}
                 <button
                   onClick={toggleProject}
-                  className="w-[35px] h-[35px] mb-6 flex items-center justify-center hover:bg-purple-950 rounded ">
+                  className="w-[35px] h-[35px] sideToolsObject sideToolsObject1 mb-6 flex items-center justify-center hover:bg-purple-950 rounded ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 448 512"
-                    className=" w-[22px] h-[22px] "
+                    className="sideToolsObject w-[22px] h-[22px] "
                   >
                     <path
                       fill="#6f1ed2"
@@ -657,7 +657,7 @@ const ImageGeneration = () => {
 
             {/* home screen main view start  */}
             {showChoosedImage && (
-              <div className="ml-2 p-2 w-[65vw] border-0 h-full bg-gray-900 rounded flex items-center justify-center relative">
+              <div className="ml-2 imageViewPort p-2 w-[65vw] border-0 h-full bg-gray-900 rounded flex items-center justify-center relative">
                 {/* showing generated image start pop model */}
                 <div className="absolute z-20 flex items-center justify-center align-middle p-10 max-w-full h-full">
                   <img
@@ -729,7 +729,7 @@ const ImageGeneration = () => {
 
             {/* side bar start*/}
             {showSettings && (
-              <div className="w-[30vw] px-3 h-full bg-gray-900 rounded">
+              <div className="w-[30vw] showSettingsSide px-3 h-full bg-gray-900 rounded">
                 <div className="w-full h-[83vh] overflow-scroll no-scrollbar">
                   <div className="w-full border-0 flex flex-col items-center justify-between rounded">
                     {/* all button of image view delete , download , share ,replicate , information of images */}
@@ -1171,7 +1171,7 @@ const ImageGeneration = () => {
                     <p>Generate</p>
                   </div>
 
-                  <p className="absolute border border-gray-500 flex items-center justify-center rounded w-fit h-fit p-1 px-2 text-xs ml-[24vw]">
+                  <p className="absolute border generateButoon border-gray-500 flex items-center justify-center rounded w-fit h-fit p-1 px-2 text-xs ml-[24vw]">
                     {credits}
                   </p>
                 </button>

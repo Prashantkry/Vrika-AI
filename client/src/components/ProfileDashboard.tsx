@@ -139,23 +139,23 @@ const ProfileDashboard = () => {
 
   return (
     <>
-      <div className="border-0 border-indigo-900 rounded flex p-10 pt-5 m- my-6 text-gray-400 items-center justify-center w-[94vw] h-[90vh]">
+      <div className="border-0 profileImageData no-scrollbar border-indigo-900 rounded flex p-10 pt-5 m- my-6 text-gray-400 items-center justify-center w-[94vw] h-[90vh]">
         {/* user data */}
         {profileData !== null && (
-          <div className='w-[24vw] h-full border-r border-gray-700 mr-3.5'>
-            <div className='flex flex-col justify-center items-center'>
-              <img src={profileData.pImage} alt="" className='w-[180px] h-[180px] rounded border border-gray-700 mt-4' />
-              <div className='flex items-center justify-center'>
-                <h1 className="text-2xl font-bold">{profileData.UserName}</h1>
+          <div className='w-[24vw] profileData h-ful border-r border-gray-700 mr-3.5'>
+            <div className='flex personal flex-col justify-center items-center'>
+              <img src={profileData.pImage} alt="" className='proImg w-[180px] h-[180px] rounded border border-gray-700 mt-4' />
+              <div className='flex userName items-center justify-center'>
+                <h1 className="text-2xl uName font-bold">{profileData.UserName}</h1>
                 <p className='ml-3 mt-1 text-indigo-500'>
                   Pro
                 </p>
               </div>
-              <button className='bg-indigo-700 w-[60%] my-3 rounded py-2 ' onClick={redirectToUpgrade}>
+              <button className='bg-indigo-700 uBtn w-[60%] my-3 rounded py-2 ' onClick={redirectToUpgrade}>
                 Upgrade Plan
               </button>
             </div>
-            <div className='flex flex-col items-start justify-start text-sm ml-5 px-10 mt-5'>
+            <div className='flex userPay flex-col items-start justify-start text-sm ml-5 px-10 mt-5'>
               <h3 className="font-semibold tracking-wide leading-6 text-indigo-400"><span className='text-indigo-600'>Subscription - </span>{profileData.Subscriptions.product}</h3>
               <h3 className="font-semibold tracking-wide leading-6 text-indigo-400"><span className='text-indigo-600'>Subscription Status -</span> {profileData.Subscriptions.status ? 'Active' : 'Inactive'}</h3>
               <h3 className="font-semibold tracking-wide leading-6 text-indigo-400"><span className='text-indigo-600'>Subscription Price -</span> {profileData.Subscriptions.amount}</h3>
@@ -168,7 +168,7 @@ const ProfileDashboard = () => {
         )}
 
         {/* images created */}
-        <div className='w-[70vw] h-full'>
+        <div className='w-[70vw] profileImage h-full'>
           {/* navbar */}
           <div className="h-[8vh] w-full border-0 flex items-center justify-between ">
             <div className="flex items-center justify-around p-1 bg-gray-950 relative">
@@ -179,7 +179,7 @@ const ProfileDashboard = () => {
                 Dashboard
               </button>
               <p
-                className={`mr-2 p-1 px-3 rounded tracking-wide ${activeTab === "favorite" ? "text-purple-800" : ""
+                className={`mr-2 GeneratedImages p-1 px-3 rounded tracking-wide ${activeTab === "favorite" ? "text-purple-800" : ""
                   }`}
               >
                 All Generated Images
@@ -187,7 +187,7 @@ const ProfileDashboard = () => {
             </div>
             <input
               type="text"
-              className=" w-[17vw] h-[4vh] px-1 placeholder-slate-700 bg-transparent outline-none border border-gray-600 rounded "
+              className=" w-[17vw] h-[4vh] px-1 SearchImages placeholder-slate-700 bg-transparent outline-none border border-gray-600 rounded "
               placeholder="Search images"
             />
           </div>
@@ -217,10 +217,9 @@ const ProfileDashboard = () => {
 
               {/* big view of images pop model*/}
               {viewImage !== null && (
-                <div className='absolute inset-0 flex items-center justify-center m-5 p-2 w-[90%] h-[90%] mx-auto my-auto rounded bg-gray-950 border-2 border-gray-900' onClick={() => showHideBigImage(viewImage)}>
-                  <img src={imagesGenerated[viewImage].url} alt="" className='w-[70%] h-full rounded' id='viewImages' />
-                  <div className="w-[29%] h-full">
-
+                <div className='absolute popImage inset-0 flex items-center justify-center m-5 p-2 w-[90%] h-[90%] mx-auto my-auto rounded bg-gray-950 border-2 border-gray-900' onClick={() => showHideBigImage(viewImage)}>
+                  <img src={imagesGenerated[viewImage].url} alt="" className='w-[70%] popImg h-full rounded' id='viewImages' />
+                  <div className="w-[29%] generatedCon h-full">
                     {/* content data */}
                     <div className="w-full h-full p-5 text-xs">
                       <h3 className="font-bold text-indigo-600 text-sm mb-1">Prompt:</h3>
