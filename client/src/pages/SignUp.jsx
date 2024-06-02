@@ -71,7 +71,7 @@ export default function SignUpPage() {
     <>
       <ToastContainer />
       <div className="bg-gray-950 h-[92vh] flex items-center justify-around border-0">
-        <div className="w-[60vw] mainDivSignUp2 md:flex items-center justify-center border-2">
+        <div className="w-[60vw] mainDivSignUp2 md:flex items-center justify-center border-0">
           <div className="bg-gray-900 w-[80%] mainDivSignUp h-full shadow-lg rounded px-2 py-6">
             <p
               tabIndex={0}
