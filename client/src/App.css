@@ -361,6 +361,18 @@ input[type="number"]::-webkit-outer-spin-button {
     width: 100%;
     height: 50vh;
   }
+  /* ! sign up page  */
+  .mainDivSignUp2 {
+    width: 80%;
+    height: auto;
+  }
+  .mainDivSignUp {
+    width: 100%;
+    height: auto;
+  }
+  .profileSignUpImg {
+    height: 35vh;
+  }
 }
 
 /* lg */
@@ -468,6 +480,19 @@ input[type="number"]::-webkit-outer-spin-button {
   .companyS {
     width: 100%;
     /* border: 2px rgb(19, 151, 15) solid; */
+  }
+
+  /* ! sign up page  */
+  .mainDivSignUp2 {
+    width: 80%;
+    height: auto;
+  }
+  .mainDivSignUp {
+    width: 100%;
+    height: auto;
+  }
+  .profileSignUpImg {
+    height: 35vh;
   }
 }
 
@@ -586,6 +611,19 @@ input[type="number"]::-webkit-outer-spin-button {
   .companyS {
     width: 100%;
     /* border: 2px rgb(19, 151, 15) solid; */
+  }
+
+  /* ! sign up page  */
+  .mainDivSignUp2 {
+    width: 80%;
+    height: auto;
+  }
+  .mainDivSignUp {
+    width: 100%;
+    height: auto;
+  }
+  .profileSignUpImg {
+    height: 35vh;
   }
 }
 
@@ -873,5 +911,18 @@ input[type="number"]::-webkit-outer-spin-button {
   .companyS {
     width: 100%;
     /* border: 2px rgb(19, 151, 15) solid; */
+  }
+
+  /* ! sign up page  */
+  .mainDivSignUp2 {
+    width: 80%;
+    height: auto;
+  }
+  .mainDivSignUp {
+    width: 100%;
+    height: auto;
+  }
+  .profileSignUpImg {
+    height: 35vh;
   }
 }

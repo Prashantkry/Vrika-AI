@@ -70,9 +70,9 @@ export default function SignUpPage() {
   return (
     <>
       <ToastContainer />
-      <div className="bg-gray-950 h-[92vh] flex items-center justify-around border-0 px-40 py-[3vh] signUp">
-        <div className="w-[60vw] md:flex items-center justify-center border-0">
-          <div className="bg-gray-900 w-[80%] h-full shadow-lg rounded lg:px-10 sm:px-6 sm:py-10 px-2 py-6">
+      <div className="bg-gray-950 h-[92vh] flex items-center justify-around border-0">
+        <div className="w-[60vw] mainDivSignUp2 md:flex items-center justify-center border-2">
+          <div className="bg-gray-900 w-[80%] mainDivSignUp h-full shadow-lg rounded px-2 py-6">
             <p
               tabIndex={0}
               className="focus:outline-none tracking-widest text-2xl font-bold leading-6 text-gray-300"
@@ -180,8 +180,8 @@ export default function SignUpPage() {
                 </div>
               </div>
               {/* profile img */}
-              <div className="border-0 flex flex-col items-center justify-center w-[38vw] m-4 mb-0 mr-0 mt-6 pb-4 py-8 lg:h-[34vh]">
-                <div className="border border-gray-300 w-full flex items-center justify-center p-3 rounded-md lg:h-[90%]">
+              <div className="border-0 flex flex-col items-center justify-center w-[38vw] m-4 mb-0 mr-0 mt-6 pb-4 py-8 profileSignUpImg lg:h-[34vh]">
+                <div className="border border-gray-300 w-full flex items-center justify-center p-3 rounded-md h-[90%]">
                   {!selectedImage && (
                     <>
                       <label htmlFor="filePicker" className="cursor-pointer">
