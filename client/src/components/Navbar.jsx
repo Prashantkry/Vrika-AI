@@ -72,6 +72,17 @@ const Navbar = () => {
                 <li className='!m-0'><NavLink to={"/Plans"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>Price</NavLink></li>
                 <li className='!m-0'><NavLink to={"/about"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>About Us</NavLink></li>
                 <li className='!m-0'><NavLink to={"/contact"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>Contact Us</NavLink></li>
+                <li className='!m-0'>
+                {loginStatus ? (
+                    <button
+                      className="text-white"
+                      onClick={handleLogout}
+                    >
+                      Log Out
+                    </button>
+                  ) : (
+                <NavLink to={"/signIn"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>Sign In</NavLink>
+                  )}</li>
               </ul>
             </div>
           </div>}
