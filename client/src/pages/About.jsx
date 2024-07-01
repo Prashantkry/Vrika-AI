@@ -3,54 +3,54 @@ import { a1, a10, a2, a3, a4, a5, a6, a7, a8, a9 } from "../components/Image";
 
 const About = () => {
   // ! page protection start
-  useEffect(() => {
-    // Disable right-click
-    const disableRightClick = (event) => {
-      if (event.button === 2) {
-        event.preventDefault();
-        // alert("Page is protected!");
-        return false;
-      }
-    };
-    window.addEventListener('contextmenu', disableRightClick);
+  // useEffect(() => {
+  //   // Disable right-click
+  //   const disableRightClick = (event) => {
+  //     if (event.button === 2) {
+  //       event.preventDefault();
+  //       // alert("Page is protected!");
+  //       return false;
+  //     }
+  //   };
+  //   window.addEventListener('contextmenu', disableRightClick);
 
-    // Disable specific key combinations
-    const disableKeys = (event) => {
-      if (
-        (event.ctrlKey && event.shiftKey && event.key === 'I') || // Ctrl+Shift+I
-        (event.ctrlKey && event.shiftKey && event.key === 'C') || // Ctrl+Shift+C
-        (event.ctrlKey && event.shiftKey && event.key === 'J') || // Ctrl+Shift+J
-        (event.key === 'F12')  || // F12
-        (event.ctrlKey && event.key === 'S') || // Ctrl+S
-        (event.metaKey && event.key === 'S') || // Command+S (for Mac)
-        (event.ctrlKey && event.key === 's') || // Ctrl+S
-        (event.metaKey && event.key === 's') // Command+S (for Mac)
-      ) {
-        event.preventDefault();
-        // alert("Page is protected can't use Inspect mode disabled!");
-        // alert("Page is protected!");
-        return false;
-      }
-    };
-    window.addEventListener('keydown', disableKeys);
+  //   // Disable specific key combinations
+  //   const disableKeys = (event) => {
+  //     if (
+  //       (event.ctrlKey && event.shiftKey && event.key === 'I') || // Ctrl+Shift+I
+  //       (event.ctrlKey && event.shiftKey && event.key === 'C') || // Ctrl+Shift+C
+  //       (event.ctrlKey && event.shiftKey && event.key === 'J') || // Ctrl+Shift+J
+  //       (event.key === 'F12')  || // F12
+  //       (event.ctrlKey && event.key === 'S') || // Ctrl+S
+  //       (event.metaKey && event.key === 'S') || // Command+S (for Mac)
+  //       (event.ctrlKey && event.key === 's') || // Ctrl+S
+  //       (event.metaKey && event.key === 's') // Command+S (for Mac)
+  //     ) {
+  //       event.preventDefault();
+  //       // alert("Page is protected can't use Inspect mode disabled!");
+  //       // alert("Page is protected!");
+  //       return false;
+  //     }
+  //   };
+  //   window.addEventListener('keydown', disableKeys);
 
-    // Check if dev tools are opened
-    const checkDevTools = () => {
-      if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
-        document.body.innerHTML = '<h1>Dev Tools are not allowed!</h1>';
-      }
-    };
-    const devToolsCheckInterval = setInterval(checkDevTools, 1000);
+  //   // Check if dev tools are opened
+  //   const checkDevTools = () => {
+  //     if (window.outerWidth - window.innerWidth > 100 || window.outerHeight - window.innerHeight > 100) {
+  //       document.body.innerHTML = '<h1>Dev Tools are not allowed!</h1>';
+  //     }
+  //   };
+  //   const devToolsCheckInterval = setInterval(checkDevTools, 1000);
 
-    // Clean up event listeners and interval on unmount
-    return () => {
-      window.removeEventListener('contextmenu', disableRightClick);
-      window.removeEventListener('keydown', disableKeys);
-      clearInterval(devToolsCheckInterval);
-    };
-  }, []);
-
+  //   // Clean up event listeners and interval on unmount
+  //   return () => {
+  //     window.removeEventListener('contextmenu', disableRightClick);
+  //     window.removeEventListener('keydown', disableKeys);
+  //     clearInterval(devToolsCheckInterval);
+  //   };
+  // }, []);
   // ! page protection end 
+  
   return (
     <>
       <section className="overflow-hidden pt-20 h-full pb-12 lg:pt-[70px] lg:pb-[90px] bg-slate-950 dark:bg-dark">
