@@ -70,3 +70,17 @@ def predict(item):
         image_array.append(finished_image)    
         
     return image_array
+
+
+'''
+From the stable diffusion docs tell me 
+what the following parameters do:
+prompt -> str: The prompt to condition the generation on.
+num_inference_steps -> int: The number of inference steps to take. (default: 50)
+image -> torch.Tensor: The image to condition the generation on. (default: None) -> for image data
+strength -> float: The strength of the diffusion process. (default: 0.99) -> deg for changing the image data , range -> 0-1
+guidance_scale -> float: The scale of the guidance loss. (default: 0.0) -> prompt weight 
+negative_prompt -> str: The negative prompt to condition the generation on. (default: None) -> for image data
+num_images_per_prompt -> no of image o/p 
+callback_on_step_end -> Callable: A callback to run at the end of each inference step. (default: None)
+'''
