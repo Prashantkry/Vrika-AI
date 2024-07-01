@@ -33,7 +33,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="flex flex-wrap place-items-center xl:static md:static sticky top-0 z-20">
+      <div className="flex flex-wrap place-items-center xl:static md:static sticky top-0 z-20 overflow-x-hidden">
         <section className="relative mx-auto">
           <nav className="flex justify-between  bg-purple-950 text-[#ffffff] w-screen">
             <div className="px-5 xl:px-12 py-6 flex w-full items-center">
@@ -73,7 +73,7 @@ const Navbar = () => {
                 <li className='!m-0'><NavLink to={"/about"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>About Us</NavLink></li>
                 <li className='!m-0'><NavLink to={"/contact"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>Contact Us</NavLink></li>
                 <li className='!m-0'>
-                {loginStatus ? (
+                  {loginStatus ? (
                     <button
                       className="text-white"
                       onClick={handleLogout}
@@ -81,7 +81,7 @@ const Navbar = () => {
                       Log Out
                     </button>
                   ) : (
-                <NavLink to={"/signIn"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>Sign In</NavLink>
+                    <NavLink to={"/signIn"} className={({ isActive, isPending }) => isPending ? "" : isActive ? "text-indigo-400 border-b-2 border-indigo-600" : ""}>Sign In</NavLink>
                   )}</li>
               </ul>
             </div>
